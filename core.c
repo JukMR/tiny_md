@@ -11,7 +11,7 @@ void init_pos(double* rxyz, const double rho)
 {
     // inicialización de las posiciones de los átomos en un cristal FCC
 
-    double a = cbrt(4.0 / rho);
+    double a = cbrt(4.0 / rho); // cbrt=cube root
     int nucells = ceil(cbrt((double)N / 4.0));
     int idx = 0;
 
@@ -56,7 +56,7 @@ void init_vel(double* vxyz, double* temp, double* ekin)
         sumvy += vxyz[i + 1];
         sumvz += vxyz[i + 2];
         sumv2 += vxyz[i + 0] * vxyz[i + 0] + vxyz[i + 1] * vxyz[i + 1]
-            + vxyz[i + 2] * vxyz[i + 2];
+               + vxyz[i + 2] * vxyz[i + 2];
     }
 
     sumvx /= (double)N;
@@ -100,33 +100,42 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
     double rcut2 = RCUT * RCUT;
     *epot = 0.0;
 
-    for (int i = 0; i < 3 * (N - 1); i += 3) {
+
+    for (int i = 0; i < 3 * (N - 1); i += 3) {  // N - 1 iteraciones
 
         double xi = rxyz[i + 0];
         double yi = rxyz[i + 1];
         double zi = rxyz[i + 2];
 
-        for (int j = i + 3; j < 3 * N; j += 3) {
+        for (int j = i + 3; j < 3 * N; j += 3) { // N iteraciones
+
+            // 15 mult
+            // 5 suma
+            // 6 resta
+            // 1 div
+
+            // TOTAL 1+ 5 + 6 + 1 = 22 op. flotantes
+            // 22 * (N^2 - N) + 1 operaciones por llamada forces
 
             double xj = rxyz[j + 0];
             double yj = rxyz[j + 1];
             double zj = rxyz[j + 2];
 
             // distancia mínima entre r_i y r_j
-            double rx = xi - xj;
-            rx = minimum_image(rx, L);
-            double ry = yi - yj;
-            ry = minimum_image(ry, L);
-            double rz = zi - zj;
-            rz = minimum_image(rz, L);
+            double rx = xi - xj;                    // resta
+            rx = minimum_image(rx, L);              // mult suma
+            double ry = yi - yj;                    // resta
+            ry = minimum_image(ry, L);              // mult suma
+            double rz = zi - zj;                    // resta
+            rz = minimum_image(rz, L);              // mult suma
 
-            double rij2 = rx * rx + ry * ry + rz * rz;
+            double rij2 = rx * rx + ry * ry + rz * rz; // mult mult mult y suma suma
 
             if (rij2 <= rcut2) {
-                double r2inv = 1.0 / rij2;
-                double r6inv = r2inv * r2inv * r2inv;
+                double r2inv = 1.0 / rij2;  // div
+                double r6inv = r2inv * r2inv * r2inv; // mult mult
 
-                double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0);
+                double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0); // mult mult mult mult resta
 
                 fxyz[i + 0] += fr * rx;
                 fxyz[i + 1] += fr * ry;
@@ -136,8 +145,8 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
                 fxyz[j + 1] -= fr * ry;
                 fxyz[j + 2] -= fr * rz;
 
-                *epot += 4.0 * r6inv * (r6inv - 1.0) - ECUT;
-                pres_vir += fr * rij2;
+                *epot += 4.0 * r6inv * (r6inv - 1.0) - ECUT; // mult mult y resta resta
+                pres_vir += fr * rij2; // mult
             }
         }
     }

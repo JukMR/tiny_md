@@ -94,9 +94,17 @@ int main()
     }
 
     double elapsed = wtime() - start;
-    printf("# Tiempo total de simulación = %f segundos\n", elapsed);
-    printf("# Tiempo simulado = %f [fs]\n", t * 1.6);
-    printf("# ns/day = %f\n", (1.6e-6 * t) / elapsed * 86400);
+    FILE *logs;
+    logs = fopen("logs.log", "a");
+    fprintf(logs, "# Tiempo total de simulación = %f segundos\n", elapsed);
+    double foperations = (pow(N, 2) - N) * 22.0 + 1.0;
+    fprintf(logs, "%s %f \n", "Floating point operation done:" , foperations);
+    double flops = foperations/elapsed;
+    fprintf(logs, "%s %f\n", "FLOPS:", flops);
+    fprintf(logs, "%s %f\n", "kFLOPS:", flops/1000.0);
+    fprintf(logs, "%s %f\n", "MFLOPS:", flops/1000000.0);
+    fprintf(logs, "# Tiempo simulado = %f [fs]\n", t * 1.6);
+    fprintf(logs, "# ns/day = %f\n", (1.6e-6 * t) / elapsed * 86400);
     //                       ^1.6 fs -> ns       ^sec -> day
     return 0;
 }

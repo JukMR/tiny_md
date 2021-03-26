@@ -2,7 +2,16 @@
 
 > _tiny molecular dynamics_
 
-Proyecto inicial para realizar speed-up de un código de Dinámica Molecular con un potencial interatómico de Lennard-Jones. Inicialmente se dan las posiciones en un cristal FCC y velocidades aleatorias distribuidas uniformemente según la temperatura inicial. Las fuerzas se obtienen de un potencial de LJ (12-6) y la evolución temporal viene dada por el algoritmo Velocity Verlet. Se consideran condiciones periódicas de contorno para reproducir un sistema infinito. La temperatura es controlada a través de un reescaleo en las velocidades. Cada cierta cantidad de pasos de dinámica molecular se cambia la densidad del sistema y se reescalean las posiciones para obtener la ecuación de estado. Para más información se puede ver `doc/informe.pdf`.
+Proyecto inicial para realizar speed-up de un código de Dinámica Molecular con
+un potencial interatómico de Lennard-Jones. Inicialmente se dan las posiciones
+en un cristal FCC y velocidades aleatorias distribuidas uniformemente según la
+temperatura inicial. Las fuerzas se obtienen de un potencial de LJ (12-6) y la
+evolución temporal viene dada por el algoritmo Velocity Verlet. Se consideran
+condiciones periódicas de contorno para reproducir un sistema infinito. La
+temperatura es controlada a través de un reescaleo en las velocidades. Cada
+cierta cantidad de pasos de dinámica molecular se cambia la densidad del sistema
+y se reescalean las posiciones para obtener la ecuación de estado. Para más
+información se puede ver `doc/informe.pdf`.
 
 
 ### Requisitos
@@ -17,11 +26,17 @@ Para compilar se utiliza `Makefile`:
 make clean
 make
 ```
-donde `make clean` elimina los objetos compilados anteriormente y `make` compila dos ejecutables: `tiny_md` y `viz`, ambos realizan la misma simulación pero el segundo posee una visualización en tiempo real.
+
+donde `make clean` elimina los objetos compilados anteriormente y `make` compila
+dos ejecutables: `tiny_md` y `viz`, ambos realizan la misma simulación pero el
+segundo posee una visualización en tiempo real.
 
 > Nota:
 >
-> _Si se desean cambiar parámetros de entrada de la simulación, puede modificarse el archivo _`parameters.h`_ o pasar los valores deseados como parámetros al preprocesador C; por ejemplo, _`make CPPFLAGS="-DN=1372"`_ cambia la cantidad de partículas que se simulan._
+> _Si se desean cambiar parámetros de entrada de la simulación, puede modificarse
+> el archivo _`parameters.h`_ o pasar los valores deseados como parámetros al
+> preprocesador C; por ejemplo, _`make CPPFLAGS="-DN=1372"`_ cambia la cantidad de
+> partículas que se simulan._
 
 
 ### Contacto

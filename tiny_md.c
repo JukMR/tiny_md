@@ -95,9 +95,9 @@ int main()
 
     double elapsed = wtime() - start;
     FILE *logs;
-    logs = fopen("logs.log", "a");
+    logs = fopen("statics.result", "a");
     fprintf(logs, "# Tiempo total de simulación = %f segundos\n", elapsed);
-    double foperations = (pow(N, 2) - N) * 22.0 + 1.0;
+    double foperations = ((N * N) - N) * 22.0 + 1.0;
     fprintf(logs, "%s %f \n", "Floating point operation done:" , foperations);
     double flops = foperations/elapsed;
     fprintf(logs, "%s %f\n", "FLOPS:", flops);

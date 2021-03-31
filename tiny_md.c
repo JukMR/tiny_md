@@ -96,6 +96,10 @@ int main()
     double elapsed = wtime() - start;
     FILE *logs;
     logs = fopen("statics.result", "a");
+    if (logs == NULL) {
+      printf("Cannot open statics log file");
+      exit(EXIT_FAILURE);
+    }
     fprintf(logs, "# Tiempo total de simulación = %f segundos\n", elapsed);
     double foperations = (((N * N) - N) * 41.0 + 5.0 ) * TRUN;
     fprintf(logs, "%s %f \n", "Floating point operation done:" , foperations);

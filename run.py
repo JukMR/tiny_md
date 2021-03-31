@@ -46,12 +46,13 @@ param = [
 ]
 
 compilers = [
-        "CC      =  gcc\n",
-        "CC      =  clang\n",
-        "CC      =  icc\n",
+        # "CC      =  gcc\n",
+        "CC      =  gcc-10\n",
+        # "CC      =  clang\n",
+        # "CC      =  icc\n",
 ]
 
-makecmd = ["make clean && make && ./tiny_md"]
+makecmd = ["make clean && make"]
 runcmd = ["./tiny_md"]
 
 
@@ -63,7 +64,7 @@ def run(compilers, param, makecmd, runcmd):
                 f.write(param[j])
             edit_make(i, j)
             run_debug(1, makecmd)
-            run_debug(29, runcmd)
+            run_debug(30, runcmd)
 
 
 run(compilers, param, makecmd, runcmd)

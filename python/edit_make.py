@@ -1,13 +1,23 @@
 param = [
-        "CFLAGS  = -O0\n", "CFLAGS  = -O0 -march=native\n",
-        "CFLAGS  = -O1\n", "CFLAGS  = -O1 -march=native\n",
-        "CFLAGS  = -O2\n", "CFLAGS  = -O2 -march=native\n",
-        "CFLAGS  = -O3\n", "CFLAGS  = -O3 -march=native\n",
-        "CFLAGS  = -O3 -DN=512 \n", "CFLAGS  = -O3 -march=native -DN=512\n",
-        "CFLAGS  = -O3 -DN=1024 \n", "CFLAGS  = -O3 -march=native -DN=1024\n",
-        ]
+        "CFLAGS  = -O0\n",
+        "CFLAGS  = -O0 -march=native\n",
+        "CFLAGS  = -O1\n",
+        "CFLAGS  = -O1 -march=native\n",
+        "CFLAGS  = -O2\n",
+        "CFLAGS  = -O2 -march=native\n",
+        "CFLAGS  = -O3\n",
+        "CFLAGS  = -O3 -march=native\n",
+        "CFLAGS  = -O3 -DN=512 \n",
+        "CFLAGS  = -O3 -march=native -DN=512\n",
+        "CFLAGS  = -O3 -DN=1024 \n",
+        "CFLAGS  = -O3 -march=native -DN=1024\n",
+]
+
 compilers = [
-        "CC      =  gcc\n", "CC      =  clang\n",
+        # "CC      =  gcc\n",
+        "CC      =  gcc-10\n",
+        # "CC      =  clang\n",
+        # "CC      =  icc\n",
 ]
 
 

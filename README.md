@@ -40,7 +40,18 @@ segundo posee una visualización en tiempo real.
 
 
 ### Contacto
-
 Por errores, preguntas o sugerencias contactarse con:
-
 + Francisco Fernandez (<fernandezfrancisco2195@gmail.com>)
+
+
+
+### Comentarios y Resultados con 1 único core (Versión 0 del código por defecto)
++ profiling con perf --> forces:53,86% | minimum_image:44,13%
++ En forces se hacen (N^2 - N) * 22 + 1  operaciones (es decir del orden O(N)=N^44)
++ Con un procesador AMD, el uso del compilador de intel icc dio más lento que gcc
++ Al agrandar de un tamaño 100 a 512 mejora el tiempo, pero con 1024 empeoró. Pensamos que 
+ esto pasa porque la caché se queda sin espacio y se necesita consultar a memoria cuando el
+ tamaño aumenta.
+ 
+ 
+

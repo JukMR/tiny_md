@@ -61,7 +61,7 @@ def Average(lst):
 
 # Abrir archivo de salida de tiny_md para procesarlo
 try:
-    with open("../results/gcc_clang_statics.result", 'r') as f:
+    with open("../results/clang_statics.res", 'r') as f:
         avg_list = []
         tmp = []
         for line in f:

@@ -63,7 +63,7 @@ runcmd = ["./tiny_md"]
 def run(compilers, param, makecmd, runcmd):
     for i in range(len(compilers)):
         for j in range(len(param)):
-            with open('statics.result', "a") as f:
+            with open('statics.res', "a") as f:
                 f.write(compilers[i])
                 f.write(param[j])
             edit_make(i, j)

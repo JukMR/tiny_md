@@ -95,7 +95,7 @@ int main()
 
     double elapsed = wtime() - start;
     FILE *logs;
-    logs = fopen("statics.result", "a");
+    logs = fopen("statics.res", "a");
     if (logs == NULL) {
       printf("Cannot open statics log file");
       exit(EXIT_FAILURE);

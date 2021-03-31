@@ -38,6 +38,10 @@ param = [
         "CFLAGS  = -O2\n",
         "CFLAGS  = -O2 -march=native\n",
         "CFLAGS  = -O3\n",
+        "CFLAGS  = -O3\n -floop-block",
+        "CFLAGS  = -O3\n -ffast-math",
+        "CFLAGS  = -O3\n -funroll-loops",
+
         "CFLAGS  = -O3 -march=native\n",
         "CFLAGS  = -O3 -DN=512 \n",
         "CFLAGS  = -O3 -march=native -DN=512\n",

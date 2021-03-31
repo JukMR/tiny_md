@@ -97,12 +97,13 @@ int main()
     FILE *logs;
     logs = fopen("statics.result", "a");
     fprintf(logs, "# Tiempo total de simulación = %f segundos\n", elapsed);
-    double foperations = ((N * N) - N) * 22.0 + 1.0;
+    double foperations = (((N * N) - N) * 41.0 + 5.0 ) * TRUN;
     fprintf(logs, "%s %f \n", "Floating point operation done:" , foperations);
     double flops = foperations/elapsed;
     fprintf(logs, "%s %f\n", "FLOPS:", flops);
-    fprintf(logs, "%s %f\n", "kFLOPS:", flops/1000.0);
-    fprintf(logs, "%s %f\n", "MFLOPS:", flops/1000000.0);
+    fprintf(logs, "%s %f\n", "kFLOPS:", flops / (1000.0));
+    fprintf(logs, "%s %f\n", "MFLOPS:", flops / (1000.0 * 1000.0));
+    fprintf(logs, "%s %f\n", "GFLOPS:", flops / (1000.0 * 1000.0 * 1000.0));
     fprintf(logs, "# Tiempo simulado = %f [fs]\n", t * 1.6);
     fprintf(logs, "# ns/day = %f\n", (1.6e-6 * t) / elapsed * 86400);
     //                       ^1.6 fs -> ns       ^sec -> day

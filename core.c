@@ -97,7 +97,7 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
         fxyz[i] = 0.0;
     }
     double pres_vir = 0.0;
-    double rcut2 = RCUT * RCUT;
+    double rcut2 = RCUT * RCUT; // mult
     *epot = 0.0;
 
 
@@ -109,13 +109,21 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
 
         for (int j = i + 3; j < 3 * N; j += 3) { // N iteraciones
 
-            // 15 mult
-            // 5 suma
-            // 6 resta
+            // Dentro del ciclo
+            // 21 mult
+            // 10 suma
+            // 9 resta
             // 1 div
+            // TOTAL 41
 
-            // TOTAL 1+ 5 + 6 + 1 = 22 op. flotantes
-            // 22 * (N^2 - N) + 1 operaciones por llamada forces
+            // Fuera del ciclo
+            // 3 mult
+            // 1 div
+            // 1 suma
+            // TOTAL 5 
+
+            // TOTAL 21 + 10 + 9 + 1 = 41 op. flotantes
+            // 41 * (N * N - N) + 5 operaciones por llamada forces
 
             double xj = rxyz[j + 0];
             double yj = rxyz[j + 1];
@@ -129,7 +137,7 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
             double rz = zi - zj;                    // resta
             rz = minimum_image(rz, L);              // mult suma
 
-            double rij2 = rx * rx + ry * ry + rz * rz; // mult mult mult y suma suma
+            double rij2 = rx * rx + ry * ry + rz * rz; // mult mult mult suma suma
 
             if (rij2 <= rcut2) {
                 double r2inv = 1.0 / rij2;  // div
@@ -137,21 +145,21 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
 
                 double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0); // mult mult mult mult resta
 
-                fxyz[i + 0] += fr * rx;
-                fxyz[i + 1] += fr * ry;
-                fxyz[i + 2] += fr * rz;
+                fxyz[i + 0] += fr * rx; // mult suma
+                fxyz[i + 1] += fr * ry; // mult suma
+                fxyz[i + 2] += fr * rz; // mult suma
 
-                fxyz[j + 0] -= fr * rx;
-                fxyz[j + 1] -= fr * ry;
-                fxyz[j + 2] -= fr * rz;
+                fxyz[j + 0] -= fr * rx; // mult resta
+                fxyz[j + 1] -= fr * ry; // mult resta
+                fxyz[j + 2] -= fr * rz; // mult resta
 
-                *epot += 4.0 * r6inv * (r6inv - 1.0) - ECUT; // mult mult y resta resta
-                pres_vir += fr * rij2; // mult
+                *epot += 4.0 * r6inv * (r6inv - 1.0) - ECUT; // mult mult resta resta suma
+                pres_vir += fr * rij2; // mult suma
             }
         }
     }
-    pres_vir /= (V * 3.0);
-    *pres = *temp * rho + pres_vir;
+    pres_vir /= (V * 3.0); // mult div
+    *pres = *temp * rho + pres_vir; // mult suma
 }
 
 

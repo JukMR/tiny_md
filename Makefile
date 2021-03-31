@@ -1,4 +1,4 @@
-CC      = gcc
+CC      = gcc-10
 CFLAGS	= -O0
 WFLAGS	= -std=c11 -Wall -Wextra -g
 LDFLAGS	= -lm

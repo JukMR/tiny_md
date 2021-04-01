@@ -100,14 +100,15 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
     double rcut2 = RCUT * RCUT; // mult
     *epot = 0.0;
 
-
-    for (int i = 0; i < 3 * (N - 1); i += 3) {  // N - 1 iteraciones
+    // (N - 1) iteraciones
+    for (int i = 0; i < 3 * (N - 1); i += 3) {
 
         double xi = rxyz[i + 0];
         double yi = rxyz[i + 1];
         double zi = rxyz[i + 2];
 
-        for (int j = i + 3; j < 3 * N; j += 3) { // N iteraciones
+        // (N - i - 1)  iteraciones
+        for (int j = i + 3; j < 3 * N; j += 3) {
 
             // Dentro del ciclo
             // 21 mult
@@ -123,7 +124,7 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
             // TOTAL 5 
 
             // TOTAL 21 + 10 + 9 + 1 = 41 op. flotantes
-            // 41 * (N * N - N) + 5 operaciones por llamada forces
+            // 41 * (N * (N - 1) / 2) + 5 operaciones por llamada forces
 
             double xj = rxyz[j + 0];
             double yj = rxyz[j + 1];

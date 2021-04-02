@@ -30,30 +30,40 @@ def edit_make(compiler, flag):
         sys.exit(1)
 
 
-param = [
+paramgcc = [
+        "CFLAGS  = -O0",
+        "CFLAGS  = -O1",
+        "CFLAGS  = -O2",
+        "CFLAGS  = -O2 -march=native",
+        "CFLAGS  = -O3",
+        "CFLAGS  = -O3 -march=native",
+        "CFLAGS  = -O3 -ffast-math",
+        "CFLAGS  = -O3 -funroll-loops",
+        "CFLAGS  = -O3 -funswitch-loops",
+        "CFLAGS  = -O3 -march=native -DN=512",
+        "CFLAGS  = -O3 -march=native -DN=1024",
+]
+param_icc = [
         "CFLAGS  = -O0\n",
-        "CFLAGS  = -O0 -march=native\n",
         "CFLAGS  = -O1\n",
-        "CFLAGS  = -O1 -march=native\n",
         "CFLAGS  = -O2\n",
-        "CFLAGS  = -O2 -march=native\n",
+        "CFLAGS  = -O2 -xHost\n",
         "CFLAGS  = -O3\n",
-        "CFLAGS  = -O3\n -floop-block",
-        "CFLAGS  = -O3\n -ffast-math",
-        "CFLAGS  = -O3\n -funroll-loops",
-
-        "CFLAGS  = -O3 -march=native\n",
-        "CFLAGS  = -O3 -DN=512 \n",
-        "CFLAGS  = -O3 -march=native -DN=512\n",
-        "CFLAGS  = -O3 -DN=1024 \n",
-        "CFLAGS  = -O3 -march=native -DN=1024\n",
+        "CFLAGS  = -O3 -xHost\n",
+        "CFLAGS  = -O3 -fp-model fast=2 -no-prec-div\n",
+        "CFLAGS  = -O3 -funroll-loops\n",
+        "CFLAGS  = -O3 -funswitch-loops\n",
+        "CFLAGS  = -O3 -xHost -DN=512\n",
+        "CFLAGS  = -O3 -xHost -DN=1024\n",
 ]
 
-compilers = [
+compilers_gcc = [
         # "CC      =  gcc\n",
-        "CC      =  gcc-10\n",
+        # "CC      =  gcc-10\n",
         # "CC      =  clang\n",
-        # "CC      =  icc\n",
+]
+compilers_icc = [
+        "CC      =  icc\n",
 ]
 
 makecmd = ["make clean && make"]
@@ -71,4 +81,4 @@ def run(compilers, param, makecmd, runcmd):
             run_debug(30, runcmd)
 
 
-run(compilers, param, makecmd, runcmd)
+run(compilers_gcc, paramgcc, makecmd, runcmd)

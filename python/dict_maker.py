@@ -4,6 +4,7 @@ import json
 from statistics import stdev, mean
 
 
+# Descomentar los parametros que se hayan probado
 param = [
         # "gcc CFLAGS  = -O0",
         # "gcc CFLAGS  = -O1",
@@ -134,6 +135,8 @@ def time_maker(path, param_arr):
         sys.exit(1)
 
 
+# Elegir el path correcto para el archivo a resumir
 path = "../results/gcc-10_new.res"
+
 avg_maker(path, param)
 time_maker(path, param)

@@ -18,18 +18,20 @@ param = [
         # "gcc CFLAGS  = -O3 -floop-block",
         # "gcc CFLAGS  = -O3 -march=native -DN=512",
         # "gcc CFLAGS  = -O3 -march=native -DN=1024",
-        "gcc-10 CFLAGS  = -O0",
-        "gcc-10 CFLAGS  = -O1",
-        "gcc-10 CFLAGS  = -O2",
-        "gcc-10 CFLAGS  = -O2 -march=native",
-        "gcc-10 CFLAGS  = -O3",
-        "gcc-10 CFLAGS  = -O3 -march=native",
-        "gcc-10 CFLAGS  = -O3 -ffast-math",
-        "gcc-10 CFLAGS  = -O3 -funroll-loops",
-        "gcc-10 CFLAGS  = -O3 -funswitch-loops",
-        "gcc-10 CFLAGS  = -O3 -floop-block",
-        "gcc-10 CFLAGS  = -O3 -march=native -DN=512",
-        "gcc-10 CFLAGS  = -O3 -march=native -DN=1024",
+        # "gcc-10 CFLAGS  = -O0",
+        # "gcc-10 CFLAGS  = -O1",
+        # "gcc-10 CFLAGS  = -O2",
+        # "gcc-10 CFLAGS  = -O2 -march=native",
+        # "gcc-10 CFLAGS  = -O3",
+        # "gcc-10 CFLAGS  = -O3 -march=native",
+        # "gcc-10 CFLAGS  = -O3 -ffast-math",
+        # "gcc-10 CFLAGS  = -O3 -funroll-loops",
+        # "gcc-10 CFLAGS  = -O3 -funswitch-loops",
+        "gcc-10 CFLAGS  = -O3 -floop-block\n",
+        "gcc-10 CFLAGS  = -O3 -floop-block -DN=512\n",
+        "gcc-10 CFLAGS  = -O3 -floop-block -DN=1024\n",
+        # "gcc-10 CFLAGS  = -O3 -march=native -DN=512",
+        # "gcc-10 CFLAGS  = -O3 -march=native -DN=1024",
         # "clang CFLAGS  = -O0",
         # "clang CFLAGS  = -O1",
         # "clang CFLAGS  = -O2",
@@ -136,7 +138,7 @@ def time_maker(path, param_arr):
 
 
 # Elegir el path correcto para el archivo a resumir
-path = "../results/gcc-10_new.res"
+path = "../results/gcc10-floop-block.res"
 
 avg_maker(path, param)
 time_maker(path, param)

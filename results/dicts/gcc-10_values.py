@@ -9,6 +9,8 @@
   "GFLOPS: gcc-10 CFLAGS  = -O3 -funroll-loops": 0.391889,
   "GFLOPS: gcc-10 CFLAGS  = -O3 -funswitch-loops": 0.391666,
   "GFLOPS: gcc-10 CFLAGS  = -O3 -floop-block": 0.391276,
+  "GFLOPS: gcc-10 CFLAGS  = -O3 -floop-block -DN=512": 0.531013,
+  "GFLOPS: gcc-10 CFLAGS  = -O3 -floop-block -DN=1024": 0.450941,
   "GFLOPS: gcc-10 CFLAGS  = -O3 -march=native -DN=512": 0.55011,
   "GFLOPS: gcc-10 CFLAGS  = -O3 -march=native -DN=1024": 0.461018
 }
@@ -23,6 +25,8 @@
   "mean exec time: gcc-10 CFLAGS  = -O3 -funroll-loops": 6.82998,
   "mean exec time: gcc-10 CFLAGS  = -O3 -funswitch-loops": 6.834099,
   "mean exec time: gcc-10 CFLAGS  = -O3 -floop-block": 6.840892,
+  "mean exec time: gcc-10 CFLAGS  = -O3 -floop-block -DN=512": 20.201796,
+  "mean exec time: gcc-10 CFLAGS  = -O3 -floop-block -DN=1024": 95.255632,
   "mean exec time: gcc-10 CFLAGS  = -O3 -march=native -DN=512": 19.500613,
   "mean exec time: gcc-10 CFLAGS  = -O3 -march=native -DN=1024": 93.173885
 }
@@ -37,6 +41,8 @@
   "stdev exec time: gcc-10 CFLAGS  = -O3 -funroll-loops": 0.042798,
   "stdev exec time: gcc-10 CFLAGS  = -O3 -funswitch-loops": 0.0587,
   "stdev exec time: gcc-10 CFLAGS  = -O3 -floop-block": 0.058071,
+  "stdev exec time: gcc-10 CFLAGS  = -O3 -floop-block -DN=512": 0.138851,
+  "stdev exec time: gcc-10 CFLAGS  = -O3 -floop-block -DN=1024": 1.047064,
   "stdev exec time: gcc-10 CFLAGS  = -O3 -march=native -DN=512": 0.142238,
   "stdev exec time: gcc-10 CFLAGS  = -O3 -march=native -DN=1024": 1.041649
 }

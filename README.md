@@ -54,5 +54,10 @@ Por errores, preguntas o sugerencias contactarse con:
   Pensamos que esto pasa porque la caché se queda sin espacio y se necesita
   consultar a memoria cuando el tamaño aumenta.
  
- 
-
+ ### Algunas pruebas para empezar a optimizar el código
++ Probé de modificar las expresiones en forces para multiplicar todo y en el paso final 
+  dividir (gané menos de 1% de tiempo no valió la pena)
++ Probé de utilizar una función de potencia supuestamente más optimizada pero no pude sacar
+  más velocidad
++ Probé de cambiar los double por float y corre en la mitad de tiempo, pero hay que revisar
+  porque me cambiaron los valores

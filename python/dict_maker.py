@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 from functools import reduce
 import json
@@ -73,7 +74,7 @@ def Average(lst):
 
 
 # Abrir archivo de salida de tiny_md para procesarlo
-def avg_maker(path, param_arr):
+def avg_maker(path, param_arr, app_arr):
     try:
         with open(path, 'r') as f:
             avg_list = []
@@ -90,6 +91,7 @@ def avg_maker(path, param_arr):
 
         avg_list = avg_list[1:]
 
+        output_lst = []
         empty_lst = []
         for i in avg_list:
             i = Average(i)
@@ -97,15 +99,16 @@ def avg_maker(path, param_arr):
 
         dict = {}
         for i in range(len(empty_lst)):
-            dict["GFLOPS: " + param_arr[i]] = round(empty_lst[i], 6)
-        print(json.dumps(dict, indent=2))
+            dict["GFLOPS: " + param_arr[i][:-1]] = round(empty_lst[i], 6)
+        app_arr.append(dict)
 
     except IOError:
         print("Cannot open file")
         sys.exit(1)
+    return app_arr
 
 
-def time_maker(path, param_arr):
+def time_maker(path, param_arr, app_arr):
     try:
         with open(path, 'r') as f:
             avg_list = []
@@ -121,7 +124,6 @@ def time_maker(path, param_arr):
             avg_list.append(tmp)
 
         avg_list = avg_list[1:]
-
         empty_lst = []
         sigma_list = []
         for i in avg_list:
@@ -132,24 +134,32 @@ def time_maker(path, param_arr):
 
         mean_dict, sigma_dict = {}, {}
         for i in range(len(empty_lst)):
-            mean_dict["mean exec time: " + param_arr[i]] = (
+            mean_dict["mean exec time: " + param_arr[i][:-1]] = (
                                                     round(empty_lst[i], 6))
-        print(json.dumps(mean_dict, indent=2))
+        app_arr.append(mean_dict)
 
         for i in range(len(sigma_list)):
-            sigma_dict["stdev exec time: " + param_arr[i]] = (
+            sigma_dict["stdev exec time: " + param_arr[i][:-1]] = (
                                                     round(sigma_list[i], 6))
-        print(json.dumps(sigma_dict, indent=2))
+        app_arr.append(sigma_dict)
 
     except IOError:
         print("Cannot open file")
         sys.exit(1)
+    return app_arr
 
 
-# Elegir el path correcto para el archivo a resumir
-file_name = input("Enter file name under results/ directory\n")
+# Elegir el path para el archivo .res de entrada
+file_name = input("Agregar el nombre del archivo .res a procesar\n")
 path = "../results/" + file_name
-# path = "../results/gcc10-floop-block.res"
+path = path + '.res'
 
-avg_maker(path, param)
-time_maker(path, param)
+# Agregar el nombre del arreglo a generar para salida
+# Ejemplo: icc, clang, gcc-10, gcc, sample_test
+out_file_name = input("Enter output file name\n")
+out_file_name = out_file_name + '.py'
+
+result = []
+result = avg_maker(path, param, result)
+result = time_maker(path, param, result)
+print(f"{out_file_name[:-3]} = {result}")

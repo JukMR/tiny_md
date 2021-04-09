@@ -47,21 +47,44 @@ def run(compilers, param, makecmd, runcmd):
 
 # Import parameters from settings/params.py
 
-param_gcc, param_icc, compilers_gcc, compilers_icc = [], [], [], []
 tmp = sys.path
 sys.path.append("settings")
-from params import param_gcc as p_gcc  # noqa: E402
-from params import param_icc as p_icc  # noqa: E402
-from params import compilers_gcc as c_gcc  # noqa: E402
-from params import compilers_icc as c_icc  # noqa: E402
-param_gcc = p_gcc
-param_icc = p_icc
-compilers_gcc = c_gcc
-compilers_icc = c_icc
+compiler, param = [], []
+if (sys.argv[1] == 'gcc'):
+    from params import param_gcc as p_gcc
+    from params import compilers_gcc as c_gcc
+    compiler = c_gcc
+    param = p_gcc
+elif (sys.argv[1] == 'gcc_10'):
+    from params import param_gcc_10 as p_gcc_10
+    from params import compilers_gcc_10 as c_gcc_10
+    compiler = c_gcc_10
+    param = p_gcc_10
+elif (sys.argv[1] == 'clang'):
+    from params import param_clang as p_clang
+    from params import compilers_clang as c_clang
+    compiler = c_clang
+    param = p_clang
+elif (sys.argv[1] == 'icc'):
+    from params import param_icc as p_icc
+    from params import compilers_icc as c_icc
+    compiler = c_icc
+    param = p_icc
+elif (sys.argv[1] == 'sample_test'):
+    from params import param_sample_test as p_sample_test
+    from params import compilers_gcc_10 as compilers_gcc_10
+    compiler = compilers_gcc_10
+    param = p_sample_test
+elif (sys.argv[1] == 'gcc_10_floop_block'):
+    from params import param_gcc_10_floop_block as p_gcc_10_floop_block
+    from params import compilers_gcc_10 as compilers_gcc_10
+    compiler = compilers_gcc_10
+    param = p_gcc_10_floop_block
+
 sys.path = tmp
 
 makecmd = ["make clean && make"]
 runcmd = ["./tiny_md"]
 
 
-run(compilers_gcc, param_gcc, makecmd, runcmd)
+run(compiler, param, makecmd, runcmd)

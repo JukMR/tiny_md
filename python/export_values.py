@@ -14,19 +14,19 @@ set = sys.argv[1]
 tmp = sys.path
 sys.path.append('../results/dicts/')
 if set == 'clang':
-    from clang_values import clang
+    from clang_dict import clang
     export_values(clang)
 elif set == 'gcc':
-    from gcc_values import gcc
+    from gcc_dict import gcc
     export_values(gcc)
 elif set == 'gcc_10':
-    from gcc_10_values import gcc_10
+    from gcc_10_dict import gcc_10
     export_values(gcc_10)
 elif set == 'icc':
-    from icc_values import icc
+    from icc_dict import icc
     export_values(icc)
 elif set == 'sample_test':
-    from sample_test import sample_test
+    from sample_test_dict import sample_test
     export_values(sample_test)
 
 sys.path = tmp

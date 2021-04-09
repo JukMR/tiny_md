@@ -3,70 +3,71 @@ import sys
 from functools import reduce
 import json
 from statistics import stdev, mean
+import os
 
 
 # Descomentar los parametros que se hayan probado
-param = [
-        # "gcc CFLAGS  = -O0",
-        # "gcc CFLAGS  = -O1",
-        # "gcc CFLAGS  = -O2",
-        # "gcc CFLAGS  = -O2 -march=native",
-        # "gcc CFLAGS  = -O3",
-        # "gcc CFLAGS  = -O3 -march=native",
-        # "gcc CFLAGS  = -O3 -ffast-math",
-        # "gcc CFLAGS  = -O3 -funroll-loops",
-        # "gcc CFLAGS  = -O3 -funswitch-loops",
-        # "gcc CFLAGS  = -O3 -floop-block",
-        # "gcc CFLAGS  = -O3 -march=native -DN=512",
-        # "gcc CFLAGS  = -O3 -march=native -DN=1024",
-        # "gcc-10 CFLAGS  = -O0",
-        # "gcc-10 CFLAGS  = -O1",
-        # "gcc-10 CFLAGS  = -O2",
-        # "gcc-10 CFLAGS  = -O2 -march=native",
-        # "gcc-10 CFLAGS  = -O3",
-        # "gcc-10 CFLAGS  = -O3 -march=native",
-        # "gcc-10 CFLAGS  = -O3 -ffast-math",
-        # "gcc-10 CFLAGS  = -O3 -funroll-loops",
-        # "gcc-10 CFLAGS  = -O3 -funswitch-loops",
-        # "gcc-10 CFLAGS  = -O3 -floop-block\n",
-        # "gcc-10 CFLAGS  = -O3 -floop-block -DN=512\n",
-        # "gcc-10 CFLAGS  = -O3 -floop-block -DN=1024\n",
-        # "gcc-10 CFLAGS  = -O3 -march=native -DN=512",
-        # "gcc-10 CFLAGS  = -O3 -march=native -DN=1024",
-        "CFLAGS  = -O3 -march=native -DN=300\n",
-        "CFLAGS  = -O3 -march=native -DN=356\n",
-        "CFLAGS  = -O3 -march=native -DN=400\n",
-        "CFLAGS  = -O3 -march=native -DN=500\n",
-        "CFLAGS  = -O3 -march=native -DN=600\n",
-        "CFLAGS  = -O3 -march=native -DN=700\n",
-        "CFLAGS  = -O3 -march=native -DN=800\n",
-        "CFLAGS  = -O3 -march=native -DN=900\n",
-        "CFLAGS  = -O3 -march=native -DN=1000\n",
-        # "clang CFLAGS  = -O0",
-        # "clang CFLAGS  = -O1",
-        # "clang CFLAGS  = -O2",
-        # "clang CFLAGS  = -O2 -march=native",
-        # "clang CFLAGS  = -O3",
-        # "clang CFLAGS  = -O3 -march=native",
-        # "clang CFLAGS  = -O3 -ffast-math",
-        # "clang CFLAGS  = -O3 -funroll-loops",
-        # "clang CFLAGS  = -O3 -funswitch-loops",
-        # # "clang CFLAGS  = -O3 -floop-block",  # doesn't work on clang
-        # "clang CFLAGS  = -O3 -march=native -DN=512",
-        # "clang CFLAGS  = -O3 -march=native -DN=1024",
-        # " -icc CFLAGS  = -O0\n",
-        # " -icc CFLAGS  = -O1\n",
-        # " -icc CFLAGS  = -O2\n",
-        # " -icc CFLAGS  = -O2 -xHost\n",
-        # " -icc CFLAGS  = -O3\n",
-        # " -icc CFLAGS  = -O3 -xHost\n",
-        # " -icc CFLAGS  = -O3 -fp-model fast=2 -no-prec-div\n",
-        # " -icc CFLAGS  = -O3 -funroll-loops\n",
-        # " -icc CFLAGS  = -O3 -funswitch-loops\n",
-        # # -icc CFLAGS  = -O3 -floop-block\n", # doesn't work on icc
-        # " -icc CFLAGS  = -O3 -xHost -DN=512\n",
-        # " -icc CFLAGS  = -O3 -xHost -DN=1024\n",
-]
+# param = [
+#         # "gcc CFLAGS  = -O0",
+#         # "gcc CFLAGS  = -O1",
+#         # "gcc CFLAGS  = -O2",
+#         # "gcc CFLAGS  = -O2 -march=native",
+#         # "gcc CFLAGS  = -O3",
+#         # "gcc CFLAGS  = -O3 -march=native",
+#         # "gcc CFLAGS  = -O3 -ffast-math",
+#         # "gcc CFLAGS  = -O3 -funroll-loops",
+#         # "gcc CFLAGS  = -O3 -funswitch-loops",
+#         # "gcc CFLAGS  = -O3 -floop-block",
+#         # "gcc CFLAGS  = -O3 -march=native -DN=512",
+#         # "gcc CFLAGS  = -O3 -march=native -DN=1024",
+#         # "gcc-10 CFLAGS  = -O0",
+#         # "gcc-10 CFLAGS  = -O1",
+#         # "gcc-10 CFLAGS  = -O2",
+#         # "gcc-10 CFLAGS  = -O2 -march=native",
+#         # "gcc-10 CFLAGS  = -O3",
+#         # "gcc-10 CFLAGS  = -O3 -march=native",
+#         # "gcc-10 CFLAGS  = -O3 -ffast-math",
+#         # "gcc-10 CFLAGS  = -O3 -funroll-loops",
+#         # "gcc-10 CFLAGS  = -O3 -funswitch-loops",
+#         # "gcc-10 CFLAGS  = -O3 -floop-block\n",
+#         # "gcc-10 CFLAGS  = -O3 -floop-block -DN=512\n",
+#         # "gcc-10 CFLAGS  = -O3 -floop-block -DN=1024\n",
+#         # "gcc-10 CFLAGS  = -O3 -march=native -DN=512",
+#         # "gcc-10 CFLAGS  = -O3 -march=native -DN=1024",
+#         "CFLAGS  = -O3 -march=native -DN=300\n",
+#         "CFLAGS  = -O3 -march=native -DN=356\n",
+#         "CFLAGS  = -O3 -march=native -DN=400\n",
+#         "CFLAGS  = -O3 -march=native -DN=500\n",
+#         "CFLAGS  = -O3 -march=native -DN=600\n",
+#         "CFLAGS  = -O3 -march=native -DN=700\n",
+#         "CFLAGS  = -O3 -march=native -DN=800\n",
+#         "CFLAGS  = -O3 -march=native -DN=900\n",
+#         "CFLAGS  = -O3 -march=native -DN=1000\n",
+#         # "clang CFLAGS  = -O0",
+#         # "clang CFLAGS  = -O1",
+#         # "clang CFLAGS  = -O2",
+#         # "clang CFLAGS  = -O2 -march=native",
+#         # "clang CFLAGS  = -O3",
+#         # "clang CFLAGS  = -O3 -march=native",
+#         # "clang CFLAGS  = -O3 -ffast-math",
+#         # "clang CFLAGS  = -O3 -funroll-loops",
+#         # "clang CFLAGS  = -O3 -funswitch-loops",
+#         # # "clang CFLAGS  = -O3 -floop-block",  # doesn't work on clang
+#         # "clang CFLAGS  = -O3 -march=native -DN=512",
+#         # "clang CFLAGS  = -O3 -march=native -DN=1024",
+#         # " -icc CFLAGS  = -O0\n",
+#         # " -icc CFLAGS  = -O1\n",
+#         # " -icc CFLAGS  = -O2\n",
+#         # " -icc CFLAGS  = -O2 -xHost\n",
+#         # " -icc CFLAGS  = -O3\n",
+#         # " -icc CFLAGS  = -O3 -xHost\n",
+#         # " -icc CFLAGS  = -O3 -fp-model fast=2 -no-prec-div\n",
+#         # " -icc CFLAGS  = -O3 -funroll-loops\n",
+#         # " -icc CFLAGS  = -O3 -funswitch-loops\n",
+#         # # -icc CFLAGS  = -O3 -floop-block\n", # doesn't work on icc
+#         # " -icc CFLAGS  = -O3 -xHost -DN=512\n",
+#         # " -icc CFLAGS  = -O3 -xHost -DN=1024\n",
+# ]
 
 
 def Average(lst):
@@ -150,14 +151,23 @@ def time_maker(path, param_arr, app_arr):
 
 
 # Elegir el path para el archivo .res de entrada
-file_name = input("Agregar el nombre del archivo .res a procesar\n")
+# file_name = input("Agregar el nombre del archivo .res a procesar\n")
+file_name = sys.argv[1]
 path = "../results/" + file_name
 path = path + '.res'
 
 # Agregar el nombre del arreglo a generar para salida
 # Ejemplo: icc, clang, gcc-10, gcc, sample_test
-out_file_name = input("Enter output file name\n")
+# out_file_name = input("Enter output file name\n")
+out_file_name = sys.argv[2]
 out_file_name = out_file_name + '.py'
+
+param = []
+actual = sys.path
+sys.path.append("../settings")
+from params import param as p  # noqa: E402
+param = p
+sys.path = actual
 
 result = []
 result = avg_maker(path, param, result)

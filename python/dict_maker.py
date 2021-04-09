@@ -107,11 +107,11 @@ out_file_name = out_file_name + '.py'
 
 # Importar todos los params array de params.py en settings/
 param = []
-actual = sys.path
+tmp = sys.path
 sys.path.append("../settings")
 from params import param_gcc as p  # noqa: E402
 param = p
-sys.path = actual
+sys.path = tmp
 
 result = []
 result = avg_maker(path, param, result)

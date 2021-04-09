@@ -11,6 +11,8 @@ def export_values(array):
 # Pass values to export as command argument
 set = sys.argv[1]
 
+tmp = sys.path
+sys.path.append('../results/dicts/')
 if set == 'clang':
     from clang_values import clang
     export_values(clang)
@@ -26,3 +28,5 @@ elif set == 'icc':
 elif set == 'sample_test':
     from sample_test import sample_test
     export_values(sample_test)
+
+sys.path = tmp

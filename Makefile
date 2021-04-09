@@ -1,5 +1,5 @@
 CC      =  gcc-10
-CFLAGS  = -O3 -floop-block -DN=1024
+CFLAGS  = -O3 -march=native -DN=1000
 WFLAGS	= -std=c11 -Wall -Wextra -g
 LDFLAGS	= -lm
 

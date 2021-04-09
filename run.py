@@ -30,7 +30,7 @@ def edit_make(compilers_list, param, compiler, flag):
         sys.exit(1)
 
 
-paramgcc = [
+param_gcc = [
         # "CFLAGS  = -O0\n",
         # "CFLAGS  = -O1\n",
         # "CFLAGS  = -O2\n",
@@ -40,10 +40,20 @@ paramgcc = [
         # "CFLAGS  = -O3 -ffast-math\n",
         # "CFLAGS  = -O3 -funroll-loops\n",
         # "CFLAGS  = -O3 -funswitch-loops\n",
-        "CFLAGS  = -O3 -floop-block\n",
-        "CFLAGS  = -O3 -floop-block -DN=512\n",
-        "CFLAGS  = -O3 -floop-block -DN=1024\n",
+        # "CFLAGS  = -O3 -floop-block\n",
+        # "CFLAGS  = -O3 -floop-block -DN=512\n",
+        # "CFLAGS  = -O3 -floop-block -DN=1024\n",
         # "CFLAGS  = -O3 -march=native -DN=512\n",
+        # "CFLAGS  = -O3 -march=native -DN=512\n",
+        "CFLAGS  = -O3 -march=native -DN=300\n",
+        "CFLAGS  = -O3 -march=native -DN=356\n",
+        "CFLAGS  = -O3 -march=native -DN=400\n",
+        "CFLAGS  = -O3 -march=native -DN=500\n",
+        "CFLAGS  = -O3 -march=native -DN=600\n",
+        "CFLAGS  = -O3 -march=native -DN=700\n",
+        "CFLAGS  = -O3 -march=native -DN=800\n",
+        "CFLAGS  = -O3 -march=native -DN=900\n",
+        "CFLAGS  = -O3 -march=native -DN=1000\n",
         # "CFLAGS  = -O3 -march=native -DN=1024\n",
 ]
 param_icc = [
@@ -81,7 +91,7 @@ def run(compilers, param, makecmd, runcmd):
                 f.write(param[j])
             edit_make(compilers, param, i, j)
             run_debug(1, makecmd)
-            run_debug(30, runcmd)
+            run_debug(15, runcmd)
 
 
-run(compilers_gcc, paramgcc, makecmd, runcmd)
+run(compilers_gcc, param_gcc, makecmd, runcmd)

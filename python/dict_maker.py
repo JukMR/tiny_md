@@ -27,11 +27,20 @@ param = [
         # "gcc-10 CFLAGS  = -O3 -ffast-math",
         # "gcc-10 CFLAGS  = -O3 -funroll-loops",
         # "gcc-10 CFLAGS  = -O3 -funswitch-loops",
-        "gcc-10 CFLAGS  = -O3 -floop-block\n",
-        "gcc-10 CFLAGS  = -O3 -floop-block -DN=512\n",
-        "gcc-10 CFLAGS  = -O3 -floop-block -DN=1024\n",
+        # "gcc-10 CFLAGS  = -O3 -floop-block\n",
+        # "gcc-10 CFLAGS  = -O3 -floop-block -DN=512\n",
+        # "gcc-10 CFLAGS  = -O3 -floop-block -DN=1024\n",
         # "gcc-10 CFLAGS  = -O3 -march=native -DN=512",
         # "gcc-10 CFLAGS  = -O3 -march=native -DN=1024",
+        "CFLAGS  = -O3 -march=native -DN=300\n",
+        "CFLAGS  = -O3 -march=native -DN=356\n",
+        "CFLAGS  = -O3 -march=native -DN=400\n",
+        "CFLAGS  = -O3 -march=native -DN=500\n",
+        "CFLAGS  = -O3 -march=native -DN=600\n",
+        "CFLAGS  = -O3 -march=native -DN=700\n",
+        "CFLAGS  = -O3 -march=native -DN=800\n",
+        "CFLAGS  = -O3 -march=native -DN=900\n",
+        "CFLAGS  = -O3 -march=native -DN=1000\n",
         # "clang CFLAGS  = -O0",
         # "clang CFLAGS  = -O1",
         # "clang CFLAGS  = -O2",
@@ -138,7 +147,9 @@ def time_maker(path, param_arr):
 
 
 # Elegir el path correcto para el archivo a resumir
-path = "../results/gcc10-floop-block.res"
+file_name = input("Enter file name under results/ directory\n")
+path = "../results/" + file_name
+# path = "../results/gcc10-floop-block.res"
 
 avg_maker(path, param)
 time_maker(path, param)

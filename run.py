@@ -2,6 +2,7 @@ import subprocess
 import sys
 
 
+# Generate sub-process that execute tiny_md
 def run_debug(number, bash_cmd_list):
     for i in range(number):
         bashCmd = bash_cmd_list
@@ -12,6 +13,7 @@ def run_debug(number, bash_cmd_list):
             sys.exit("An error has ocurred")
 
 
+# Modify makefile in order to change flags
 def edit_make(compilers_list, param, compiler, flag):
     try:
         with open('Makefile', "r") as f:
@@ -30,68 +32,36 @@ def edit_make(compilers_list, param, compiler, flag):
         sys.exit(1)
 
 
-param_gcc = [
-        # "CFLAGS  = -O0\n",
-        # "CFLAGS  = -O1\n",
-        # "CFLAGS  = -O2\n",
-        # "CFLAGS  = -O2 -march=native\n",
-        # "CFLAGS  = -O3\n",
-        # "CFLAGS  = -O3 -march=native\n",
-        # "CFLAGS  = -O3 -ffast-math\n",
-        # "CFLAGS  = -O3 -funroll-loops\n",
-        # "CFLAGS  = -O3 -funswitch-loops\n",
-        # "CFLAGS  = -O3 -floop-block\n",
-        # "CFLAGS  = -O3 -floop-block -DN=512\n",
-        # "CFLAGS  = -O3 -floop-block -DN=1024\n",
-        # "CFLAGS  = -O3 -march=native -DN=512\n",
-        # "CFLAGS  = -O3 -march=native -DN=512\n",
-        "CFLAGS  = -O3 -march=native -DN=300\n",
-        "CFLAGS  = -O3 -march=native -DN=356\n",
-        "CFLAGS  = -O3 -march=native -DN=400\n",
-        "CFLAGS  = -O3 -march=native -DN=500\n",
-        "CFLAGS  = -O3 -march=native -DN=600\n",
-        "CFLAGS  = -O3 -march=native -DN=700\n",
-        "CFLAGS  = -O3 -march=native -DN=800\n",
-        "CFLAGS  = -O3 -march=native -DN=900\n",
-        "CFLAGS  = -O3 -march=native -DN=1000\n",
-        # "CFLAGS  = -O3 -march=native -DN=1024\n",
-]
-param_icc = [
-        "CFLAGS  = -O0\n",
-        "CFLAGS  = -O1\n",
-        "CFLAGS  = -O2\n",
-        "CFLAGS  = -O2 -xHost\n",
-        "CFLAGS  = -O3\n",
-        "CFLAGS  = -O3 -xHost\n",
-        "CFLAGS  = -O3 -fp-model fast=2 -no-prec-div\n",
-        "CFLAGS  = -O3 -funroll-loops\n",
-        "CFLAGS  = -O3 -funswitch-loops\n",
-        "CFLAGS  = -O3 -xHost -DN=512\n",
-        "CFLAGS  = -O3 -xHost -DN=1024\n",
-]
-
-compilers_gcc = [
-        # "CC      =  gcc\n",
-        "CC      =  gcc-10\n",
-        # "CC      =  clang\n",
-]
-compilers_icc = [
-        "CC      =  icc\n",
-]
-
-makecmd = ["make clean && make"]
-runcmd = ["./tiny_md"]
-
-
+# Look for params on settings/params.py, modify makefile and run all the
+# posibles flags
 def run(compilers, param, makecmd, runcmd):
     for i in range(len(compilers)):
         for j in range(len(param)):
             with open('statics.res', "a") as f:
                 f.write(compilers[i])
                 f.write(param[j])
-            edit_make(compilers, param, i, j)
-            run_debug(1, makecmd)
-            run_debug(15, runcmd)
+                edit_make(compilers, param, i, j)
+                run_debug(1, makecmd)
+                run_debug(15, runcmd)
+
+
+# Import parameters from settings/params.py
+
+param_gcc, param_icc, compilers_gcc, compilers_icc = [], [], [], []
+tmp = sys.path
+sys.path.append("settings")
+from params import param_gcc as p_gcc  # noqa: E402
+from params import param_icc as p_icc  # noqa: E402
+from params import compilers_gcc as c_gcc  # noqa: E402
+from params import compilers_icc as c_icc  # noqa: E402
+param_gcc = p_gcc
+param_icc = p_icc
+compilers_gcc = c_gcc
+compilers_icc = c_icc
+sys.path = tmp
+
+makecmd = ["make clean && make"]
+runcmd = ["./tiny_md"]
 
 
 run(compilers_gcc, param_gcc, makecmd, runcmd)

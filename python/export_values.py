@@ -25,8 +25,8 @@ elif set == 'gcc_10':
 elif set == 'icc':
     from icc_dict import icc
     export_values(icc)
-elif set == 'sample_test':
-    from sample_test_dict import sample_test
-    export_values(sample_test)
+elif set == 'sample_size':
+    from sample_size_dict import sample_size
+    export_values(sample_size)
 
 sys.path = tmp

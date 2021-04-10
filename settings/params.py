@@ -42,7 +42,7 @@ param_clang = [
     "CFLAGS  = -O3 -march=native -DN=1024\n",
 ]
 
-param_sample_test = [
+param_sample_size = [
     "CFLAGS  = -O3 -march=native -DN=300\n",
     "CFLAGS  = -O3 -march=native -DN=356\n",
     "CFLAGS  = -O3 -march=native -DN=400\n",

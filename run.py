@@ -70,11 +70,11 @@ elif (sys.argv[1] == 'icc'):
     from params import compilers_icc as c_icc
     compiler = c_icc
     param = p_icc
-elif (sys.argv[1] == 'sample_test'):
-    from params import param_sample_test as p_sample_test
+elif (sys.argv[1] == 'sample_size'):
+    from params import param_sample_size as p_sample_size
     from params import compilers_gcc_10 as compilers_gcc_10
     compiler = compilers_gcc_10
-    param = p_sample_test
+    param = p_sample_size
 elif (sys.argv[1] == 'gcc_10_floop_block'):
     from params import param_gcc_10_floop_block as p_gcc_10_floop_block
     from params import compilers_gcc_10 as compilers_gcc_10

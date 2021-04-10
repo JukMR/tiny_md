@@ -63,12 +63,9 @@ plt.ylabel('GFLOPS')
 plt.show()
 
 
-
-
-
-        #oCFLAG = res[0]
-        #otime = res[1]
-#	otimedev= res[2]
-#	oGFLOPS=res[3]
-        #print (oCFLAG, otime)
-#        print (oCFLAG, otime,otimedev,oGFLOPS)
+# oCFLAG = res[0]
+# otime = res[1]
+# otimedev = res[2]
+# oGFLOPS = res[3]
+# print(oCFLAG, otime)
+# print(oCFLAG, otime, otimedev, oGFLOPS)

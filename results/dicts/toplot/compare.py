@@ -37,6 +37,7 @@ with open('compare.plot') as f:
         numlines = numlines+1
         # plt.legend(loc="upper left")
         # , label=v[0])
+
 plt.title('Comparación de tiempos para diferentes compiladores y CFLAGS.')
 plt.xlabel('tiempo [s]')
 plt.ylabel('distribución gaussiana (normalizada)')

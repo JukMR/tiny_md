@@ -14,18 +14,18 @@ param_gcc_10 = [
 ]
 
 param_gcc = [
-    "CFLAGS  = -O0",
-    "CFLAGS  = -O1",
-    "CFLAGS  = -O2",
-    "CFLAGS  = -O2 -march=native",
-    "CFLAGS  = -O3",
-    "CFLAGS  = -O3 -march=native",
-    "CFLAGS  = -O3 -ffast-math",
-    "CFLAGS  = -O3 -funroll-loops",
-    "CFLAGS  = -O3 -funswitch-loops",
-    "CFLAGS  = -O3 -floop-block",
-    "CFLAGS  = -O3 -march=native -DN=512",
-    "CFLAGS  = -O3 -march=native -DN=1024",
+    "CFLAGS  = -O0\n",
+    "CFLAGS  = -O1\n",
+    "CFLAGS  = -O2\n",
+    "CFLAGS  = -O2 -march=native\n",
+    "CFLAGS  = -O3\n",
+    "CFLAGS  = -O3 -march=native\n",
+    "CFLAGS  = -O3 -ffast-math\n",
+    "CFLAGS  = -O3 -funroll-loops\n",
+    "CFLAGS  = -O3 -funswitch-loops\n",
+    "CFLAGS  = -O3 -floop-block\n",
+    "CFLAGS  = -O3 -march=native -DN=512\n",
+    "CFLAGS  = -O3 -march=native -DN=1024\n",
 ]
 
 param_clang = [
@@ -69,9 +69,9 @@ param_icc = [
 ]
 
 param_gcc_10_floop_block_dict = [
-    "CFLAGS  = -O3 -floop-block",
-    "CFLAGS  = -O3 -floop-block -DN=512",
-    "CFLAGS  = -O3 -floop-block -DN=1024",
+    "CFLAGS  = -O3 -floop-block\n",
+    "CFLAGS  = -O3 -floop-block -DN=512\n",
+    "CFLAGS  = -O3 -floop-block -DN=1024\n",
 ]
 
 compilers_gcc = ["CC      =  gcc\n"]

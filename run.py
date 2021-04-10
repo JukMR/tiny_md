@@ -16,13 +16,13 @@ def run_debug(number, bash_cmd_list):
 # Modify makefile in order to change flags
 def edit_make(compilers_list, param, compiler, flag):
     try:
-        with open('Makefile', "r") as f:
-            a = list(f.readlines())
+        with open('Makefile', "r") as mr:
+            a = list(mr.readlines())
             a[0] = compilers_list[compiler]
             a[1] = param[flag]
             try:
-                with open('Makefile', "w") as f:
-                    f.writelines(a)
+                with open('Makefile', "w") as mw:
+                    mw.writelines(a)
                     print(f"changed:\n {a[0]} {a[1]}")
             except IOError:
                 print("Cannot open file")
@@ -37,12 +37,12 @@ def edit_make(compilers_list, param, compiler, flag):
 def run(compilers, param, makecmd, runcmd):
     for i in range(len(compilers)):
         for j in range(len(param)):
-            with open('statics.res', "a") as f:
-                f.write(compilers[i])
-                f.write(param[j])
-                edit_make(compilers, param, i, j)
-                run_debug(1, makecmd)
-                run_debug(15, runcmd)
+            with open('statics.res', "a") as sa:
+                sa.write(compilers[i])
+                sa.write(param[j])
+            edit_make(compilers, param, i, j)
+            run_debug(1, makecmd)
+            run_debug(2, runcmd)
 
 
 # Import parameters from settings/params.py

@@ -27,7 +27,6 @@ def avg_maker(path, param_arr, app_arr):
 
         avg_list = avg_list[1:]
 
-        output_lst = []
         empty_lst = []
         sigma_list = []
 

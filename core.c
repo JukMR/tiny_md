@@ -75,16 +75,28 @@ void init_vel(double* vxyz, double* temp, double* ekin)
 }
 
 
-static double minimum_image(double cordi, const double cell_length)
+
+static struct Coord minimum_image(struct Coord fix,  const double cell_length)
 {
     // imagen más cercana
 
-    if (cordi <= -0.5 * cell_length) {
-        cordi += cell_length;
-    } else if (cordi > 0.5 * cell_length) {
-        cordi -= cell_length;
+    if (fix.rx <= -0.5 * cell_length) {
+        fix.rx += cell_length;
+    } else if (fix.rx > 0.5 * cell_length) {
+        fix.rx -= cell_length;
     }
-    return cordi;
+    if (fix.ry <= -0.5 * cell_length) {
+        fix.ry += cell_length;
+    } else if (fix.ry > 0.5 * cell_length) {
+        fix.ry -= cell_length;
+    }
+    if (fix.rz <= -0.5 * cell_length) {
+        fix.rz += cell_length;
+    } else if (fix.rz > 0.5 * cell_length) {
+        fix.rz -= cell_length;
+    }
+
+    return fix;
 }
 
 
@@ -121,7 +133,7 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
             // 3 mult
             // 1 div
             // 1 suma
-            // TOTAL 5 
+            // TOTAL 5
 
             // TOTAL 21 + 10 + 9 + 1 = 41 op. flotantes
             // 41 * (N * (N - 1) / 2) + 5 operaciones por llamada forces
@@ -130,15 +142,14 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
             double yj = rxyz[j + 1];
             double zj = rxyz[j + 2];
 
+            struct Coord xyz;
             // distancia mínima entre r_i y r_j
-            double rx = xi - xj;                    // resta
-            rx = minimum_image(rx, L);              // mult suma
-            double ry = yi - yj;                    // resta
-            ry = minimum_image(ry, L);              // mult suma
-            double rz = zi - zj;                    // resta
-            rz = minimum_image(rz, L);              // mult suma
+            xyz.rx = xi - xj;                    // resta
+            xyz.ry = yi - yj;                    // resta
+            xyz.rz = zi - zj;                    // resta
+            xyz = minimum_image(xyz, L);              // mult suma
 
-            double rij2 = rx * rx + ry * ry + rz * rz; // mult mult mult suma suma
+            double rij2 = xyz.rx * xyz.rx + xyz.ry * xyz.ry + xyz.rz * xyz.rz; // mult mult mult suma suma
 
             if (rij2 <= rcut2) {
                 double r2inv = 1.0 / rij2;  // div
@@ -146,13 +157,13 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
 
                 double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0); // mult mult mult mult resta
 
-                fxyz[i + 0] += fr * rx; // mult suma
-                fxyz[i + 1] += fr * ry; // mult suma
-                fxyz[i + 2] += fr * rz; // mult suma
+                fxyz[i + 0] += fr * xyz.rx; // mult suma
+                fxyz[i + 1] += fr * xyz.ry; // mult suma
+                fxyz[i + 2] += fr * xyz.rz; // mult suma
 
-                fxyz[j + 0] -= fr * rx; // mult resta
-                fxyz[j + 1] -= fr * ry; // mult resta
-                fxyz[j + 2] -= fr * rz; // mult resta
+                fxyz[j + 0] -= fr * xyz.rx; // mult resta
+                fxyz[j + 1] -= fr * xyz.ry; // mult resta
+                fxyz[j + 2] -= fr * xyz.rz; // mult resta
 
                 *epot += 4.0 * r6inv * (r6inv - 1.0) - ECUT; // mult mult resta resta suma
                 pres_vir += fr * rij2; // mult suma

@@ -1,5 +1,5 @@
 CC      =  gcc-10
-CFLAGS  = -O3 -march=native -DN=1000
+CFLAGS  = -O3 -march=native
 WFLAGS	= -std=c11 -Wall -Wextra -g
 LDFLAGS	= -lm
 

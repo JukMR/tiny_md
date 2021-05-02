@@ -7,7 +7,7 @@
 #define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
 
 
-void init_pos(double* rxyz, const double rho)
+void init_pos(double* rx,double* ry,double* rz, const double rho)
 {
     // inicialización de las posiciones de los átomos en un cristal FCC
 
@@ -18,45 +18,44 @@ void init_pos(double* rxyz, const double rho)
     for (int i = 0; i < nucells; i++) {
         for (int j = 0; j < nucells; j++) {
             for (int k = 0; k < nucells; k++) {
-                rxyz[idx + 0] = i * a; // x
-                rxyz[idx + 1] = j * a; // y
-                rxyz[idx + 2] = k * a; // z
+                rx[idx] = i * a; // x
+                ry[idx] = j * a; // y
+                rz[idx] = k * a; // z
                     // del mismo átomo
-                rxyz[idx + 3] = (i + 0.5) * a;
-                rxyz[idx + 4] = (j + 0.5) * a;
-                rxyz[idx + 5] = k * a;
+                rx[idx + 1] = (i + 0.5) * a;
+                ry[idx + 1] = (j + 0.5) * a;
+                rz[idx + 1] = k * a;
 
-                rxyz[idx + 6] = (i + 0.5) * a;
-                rxyz[idx + 7] = j * a;
-                rxyz[idx + 8] = (k + 0.5) * a;
+                rx[idx + 2] = (i + 0.5) * a;
+                ry[idx + 2] = j * a;
+                rz[idx + 2] = (k + 0.5) * a;
 
-                rxyz[idx + 9] = i * a;
-                rxyz[idx + 10] = (j + 0.5) * a;
-                rxyz[idx + 11] = (k + 0.5) * a;
+                rx[idx + 3] = i * a;
+                ry[idx + 3] = (j + 0.5) * a;
+                rz[idx + 3] = (k + 0.5) * a;
 
-                idx += 12;
+                idx += 4;
             }
         }
     }
 }
 
 
-void init_vel(double* vxyz, double* temp, double* ekin)
+void init_vel(double* vx,double* vy,double* vz, double* temp, double* ekin)
 {
     // inicialización de velocidades aleatorias
 
     double sf, sumvx = 0.0, sumvy = 0.0, sumvz = 0.0, sumv2 = 0.0;
 
-    for (int i = 0; i < 3 * N; i += 3) {
-        vxyz[i + 0] = rand() / (double)RAND_MAX - 0.5;
-        vxyz[i + 1] = rand() / (double)RAND_MAX - 0.5;
-        vxyz[i + 2] = rand() / (double)RAND_MAX - 0.5;
+    for (int i = 0; i < N; i++) {
+        vx[i] = rand() / (double)RAND_MAX - 0.5;
+        vy[i] = rand() / (double)RAND_MAX - 0.5;
+        vz[i] = rand() / (double)RAND_MAX - 0.5;
 
-        sumvx += vxyz[i + 0];
-        sumvy += vxyz[i + 1];
-        sumvz += vxyz[i + 2];
-        sumv2 += vxyz[i + 0] * vxyz[i + 0] + vxyz[i + 1] * vxyz[i + 1]
-               + vxyz[i + 2] * vxyz[i + 2];
+        sumvx += vx[i];
+        sumvy += vy[i];
+        sumvz += vz[i];
+        sumv2 += vx[i] * vx[i] + vy[i] * vy[i] + vz[i] * vz[i];
     }
 
     sumvx /= (double)N;
@@ -66,11 +65,11 @@ void init_vel(double* vxyz, double* temp, double* ekin)
     *ekin = 0.5 * sumv2;
     sf = sqrt(T0 / *temp);
 
-    for (int i = 0; i < 3 * N; i += 3) { // elimina la velocidad del centro de masa
+    for (int i = 0; i < N; i++) { // elimina la velocidad del centro de masa
         // y ajusta la temperatura
-        vxyz[i + 0] = (vxyz[i + 0] - sumvx) * sf;
-        vxyz[i + 1] = (vxyz[i + 1] - sumvy) * sf;
-        vxyz[i + 2] = (vxyz[i + 2] - sumvz) * sf;
+        vx[i] = (vx[i] - sumvx) * sf;
+        vy[i] = (vy[i] - sumvy) * sf;
+        vz[i] = (vz[i] - sumvz) * sf;
     }
 }
 
@@ -88,27 +87,29 @@ static double minimum_image(double cordi, const double cell_length)
 }
 
 
-void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
+void forces(const double* rx,const double* ry,const double* rz, double* fx,double* fy,double* fz, double* epot, double* pres,
             const double* temp, const double rho, const double V, const double L)
 {
     // calcula las fuerzas LJ (12-6)
 
-    for (int i = 0; i < 3 * N; i++) {
-        fxyz[i] = 0.0;
+    for (int i = 0; i <  N; i++) {
+        fx[i] = 0.0;
+        fy[i] = 0.0;
+        fz[i] = 0.0;
     }
     double pres_vir = 0.0;
     double rcut2 = RCUT * RCUT; // mult
     *epot = 0.0;
 
     // (N - 1) iteraciones
-    for (int i = 0; i < 3 * (N - 1); i += 3) {
+    for (int i = 0; i < (N - 1); i++) {
 
-        double xi = rxyz[i + 0];
-        double yi = rxyz[i + 1];
-        double zi = rxyz[i + 2];
+        double xi = rx[i];
+        double yi = ry[i];
+        double zi = rz[i];
 
         // (N - i - 1)  iteraciones
-        for (int j = i + 3; j < 3 * N; j += 3) {
+        for (int j = i + 1; j <  N; j++) {
 
             // Dentro del ciclo
             // 21 mult
@@ -126,9 +127,9 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
             // TOTAL 21 + 10 + 9 + 1 = 41 op. flotantes
             // 41 * (N * (N - 1) / 2) + 5 operaciones por llamada forces
 
-            double xj = rxyz[j + 0];
-            double yj = rxyz[j + 1];
-            double zj = rxyz[j + 2];
+            double xj = rx[j];
+            double yj = ry[j];
+            double zj = rz[j];
 
             // distancia mínima entre r_i y r_j
             double rx = xi - xj;                    // resta
@@ -146,13 +147,13 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
 
                 double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0); // mult mult mult mult resta
 
-                fxyz[i + 0] += fr * rx; // mult suma
-                fxyz[i + 1] += fr * ry; // mult suma
-                fxyz[i + 2] += fr * rz; // mult suma
+                fx[i] += fr * rx; // mult suma
+                fy[i] += fr * ry; // mult suma
+                fz[i] += fr * rz; // mult suma
 
-                fxyz[j + 0] -= fr * rx; // mult resta
-                fxyz[j + 1] -= fr * ry; // mult resta
-                fxyz[j + 2] -= fr * rz; // mult resta
+                fx[j] -= fr * rx; // mult resta
+                fy[j] -= fr * ry; // mult resta
+                fz[j] -= fr * rz; // mult resta
 
                 *epot += 4.0 * r6inv * (r6inv - 1.0) - ECUT; // mult mult resta resta suma
                 pres_vir += fr * rij2; // mult suma
@@ -176,35 +177,35 @@ static double pbc(double cordi, const double cell_length)
 }
 
 
-void velocity_verlet(double* rxyz, double* vxyz, double* fxyz, double* epot,
+void velocity_verlet(double* rx,double* ry,double* rz,double* vx,double* vy,double* vz, 
+                     double* fx,double* fy,double* fz,double* epot,
                      double* ekin, double* pres, double* temp, const double rho,
                      const double V, const double L)
 {
 
-    for (int i = 0; i < 3 * N; i += 3) { // actualizo posiciones
-        rxyz[i + 0] += vxyz[i + 0] * DT + 0.5 * fxyz[i + 0] * DT * DT;
-        rxyz[i + 1] += vxyz[i + 1] * DT + 0.5 * fxyz[i + 1] * DT * DT;
-        rxyz[i + 2] += vxyz[i + 2] * DT + 0.5 * fxyz[i + 2] * DT * DT;
+    for (int i = 0; i < N; i++) { // actualizo posiciones
+        rx[i] += vx[i] * DT + 0.5 * fx[i] * DT * DT;
+        ry[i] += vy[i] * DT + 0.5 * fy[i] * DT * DT;
+        rz[i] += vz[i] * DT + 0.5 * fz[i] * DT * DT;
 
-        rxyz[i + 0] = pbc(rxyz[i + 0], L);
-        rxyz[i + 1] = pbc(rxyz[i + 1], L);
-        rxyz[i + 2] = pbc(rxyz[i + 2], L);
+        rx[i] = pbc(rx[i], L);
+        ry[i] = pbc(ry[i], L);
+        rz[i] = pbc(rz[i], L);
 
-        vxyz[i + 0] += 0.5 * fxyz[i + 0] * DT;
-        vxyz[i + 1] += 0.5 * fxyz[i + 1] * DT;
-        vxyz[i + 2] += 0.5 * fxyz[i + 2] * DT;
+        vx[i] += 0.5 * fx[i] * DT;
+        vy[i] += 0.5 * fy[i] * DT;
+        vz[i] += 0.5 * fz[i] * DT;
     }
 
-    forces(rxyz, fxyz, epot, pres, temp, rho, V, L); // actualizo fuerzas
+    forces(rx,ry,rz, fx,fy,fz, epot, pres, temp, rho, V, L); // actualizo fuerzas
 
     double sumv2 = 0.0;
-    for (int i = 0; i < 3 * N; i += 3) { // actualizo velocidades
-        vxyz[i + 0] += 0.5 * fxyz[i + 0] * DT;
-        vxyz[i + 1] += 0.5 * fxyz[i + 1] * DT;
-        vxyz[i + 2] += 0.5 * fxyz[i + 2] * DT;
+    for (int i = 0; i < N; i++) { // actualizo velocidades
+        vx[i] += 0.5 * fx[i] * DT;
+        vy[i] += 0.5 * fy[i] * DT;
+        vz[i] += 0.5 * fz[i] * DT;
 
-        sumv2 += vxyz[i + 0] * vxyz[i + 0] + vxyz[i + 1] * vxyz[i + 1]
-            + vxyz[i + 2] * vxyz[i + 2];
+        sumv2 += vx[i] * vx[i] + vy[i] * vy[i]+ vz[i] * vz[i];
     }
 
     *ekin = 0.5 * sumv2;

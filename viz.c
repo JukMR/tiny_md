@@ -10,7 +10,7 @@
 // variables globales
 static double Ekin, Epot, Temp, Pres; // variables macroscopicas
 static double Rho, V, box_size, tail, Etail, Ptail;
-static double *rxyz, *vxyz, *fxyz; // variables microscopicas
+static double *rx,*ry,*rz, *vx,*vy,*vz, *fx,*fy,*fz; // variables microscopicas
 static double Rhob, sf, epotm, presm;
 static int switcher = 0, frames = 0, mes;
 
@@ -103,10 +103,10 @@ static void draw_atoms(void)
     double dy;
     double dz;
 
-    for (di = 0; di < 3 * N; di += 3) {
-        dx = (rxyz[di + 0] / glL) * resize;
-        dy = (rxyz[di + 1] / glL) * resize;
-        dz = (rxyz[di + 2] / glL) * resize;
+    for (di = 0; di < N; di++) {
+        dx = (rx[di] / glL) * resize;
+        dy = (ry[di] / glL) * resize;
+        dz = (rz[di] / glL) * resize;
 
         glColor3d(0.0, 1.0, 0.0);
         glVertex3d(dx, dy, dz);
@@ -138,9 +138,9 @@ static void idle_func(void)
         Etail = tail * (double)N;
         Ptail = tail * Rho;
 
-        init_pos(rxyz, Rho);
-        init_vel(vxyz, &Temp, &Ekin);
-        forces(rxyz, fxyz, &Epot, &Pres, &Temp, Rho, V, box_size);
+        init_pos(rx,ry,rz, Rho);
+        init_vel(vx,vy,vz, &Temp, &Ekin);
+        forces(rx,ry,rz, fx,fy,fz, &Epot, &Pres, &Temp, Rho, V, box_size);
 
         switcher = 0;
 
@@ -160,11 +160,13 @@ static void idle_func(void)
         Ptail = tail * Rho;
 
         sf = cbrt(Rhob / Rho);
-        for (int k = 0; k < 3 * N; k++) { // reescaleo posiciones a nueva densidad
-            rxyz[k] *= sf;
+        for (int k = 0; k < N; k++) { // reescaleo posiciones a nueva densidad
+            rx[k] *= sf;
+            ry[k] *= sf;
+            rz[k] *= sf;
         }
-        init_vel(vxyz, &Temp, &Ekin);
-        forces(rxyz, fxyz, &Epot, &Pres, &Temp, Rho, V, box_size);
+        init_vel(vx,vy,vz, &Temp, &Ekin);
+        forces(rx,ry,rz, fx,fy,fz, &Epot, &Pres, &Temp, Rho, V, box_size);
 
         switcher = 0;
         if (fabs(Rho - (RHOI - 0.9f)) < 1e-6) {
@@ -176,12 +178,14 @@ static void idle_func(void)
 
         for (int i = frames; i < frames + TMES; i++) {
 
-            velocity_verlet(rxyz, vxyz, fxyz, &Epot, &Ekin, &Pres, &Temp, Rho,
+            velocity_verlet(rx,ry,rz, vx,vy,vz, fx,fy,fz, &Epot, &Ekin, &Pres, &Temp, Rho,
                             V, box_size);
 
             sf = sqrt(T0 / Temp);
-            for (int k = 0; k < 3 * N; k++) { // reescaleo de velocidades
-                vxyz[k] *= sf;
+            for (int k = 0; k < N; k++) { // reescaleo de velocidades
+                vx[k] *= sf;
+                vy[k] *= sf;
+                vz[k] *= sf;
             }
         }
 
@@ -201,12 +205,14 @@ static void idle_func(void)
 
         while (frames % TEQ != 0) {
 
-            velocity_verlet(rxyz, vxyz, fxyz, &Epot, &Ekin, &Pres, &Temp, Rho,
+            velocity_verlet(rx,ry,rz, vx,vy,vz, fx,fy,fz, &Epot, &Ekin, &Pres, &Temp, Rho,
                             V, box_size);
 
             sf = sqrt(T0 / Temp);
-            for (int k = 0; k < 3 * N; k++) { // reescaleo de velocidades
-                vxyz[k] *= sf;
+            for (int k = 0; k < N; k++) { // reescaleo de velocidades
+                vx[k] *= sf;
+                vy[k] *= sf;
+                vz[k] *= sf;
             }
 
             frames++;
@@ -264,9 +270,15 @@ int main(int argc, char** argv)
 
     glutInit(&argc, argv);
 
-    rxyz = (double*)malloc(3 * N * sizeof(double));
-    vxyz = (double*)malloc(3 * N * sizeof(double));
-    fxyz = (double*)malloc(3 * N * sizeof(double));
+    rx = (double*)malloc( N * sizeof(double));
+    ry = (double*)malloc( N * sizeof(double));
+    rz = (double*)malloc( N * sizeof(double));
+    vx = (double*)malloc( N * sizeof(double));
+    vy = (double*)malloc( N * sizeof(double));
+    vz = (double*)malloc( N * sizeof(double));
+    fx = (double*)malloc( N * sizeof(double));
+    fy = (double*)malloc( N * sizeof(double));
+    fz = (double*)malloc( N * sizeof(double));
 
     // parametros iniciales para que los pueda usar (antes de modificar)
     // `idle_func`
@@ -279,9 +291,9 @@ int main(int argc, char** argv)
     Etail = tail * (double)N;
     Ptail = tail * Rho;
 
-    init_pos(rxyz, Rho);
-    init_vel(vxyz, &Temp, &Ekin);
-    forces(rxyz, fxyz, &Epot, &Pres, &Temp, Rho, V, box_size);
+    init_pos(rx,ry,rz, Rho);
+    init_vel(vx,vy,vz, &Temp, &Ekin);
+    forces(rx,ry,rz, fx,fy,fz, &Epot, &Pres, &Temp, Rho, V, box_size);
     //
     //
 

@@ -131,12 +131,34 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
             double zj = rxyz[j + 2];
 
             // distancia mínima entre r_i y r_j
+//            double rx = xi - xj;                    // resta
+//            rx = minimum_image(rx, L);              // mult suma
+//            double ry = yi - yj;                    // resta
+//            ry = minimum_image(ry, L);              // mult suma
+//            double rz = zi - zj;                    // resta
+//            rz = minimum_image(rz, L);              // mult suma
+
+	    double L2=0.5*L;
+            // distancia mínima entre r_i y r_j
             double rx = xi - xj;                    // resta
-            rx = minimum_image(rx, L);              // mult suma
+	    if (rx <= -L2) {
+        	rx += L;
+    	    } else if (rx > L2) {
+            	rx -= L;
+    	    }
             double ry = yi - yj;                    // resta
-            ry = minimum_image(ry, L);              // mult suma
+	    if (ry <= -L2) {
+        	ry += L;
+    	    } else if (ry > L2) {
+            	ry -= L;
+    	    }
             double rz = zi - zj;                    // resta
-            rz = minimum_image(rz, L);              // mult suma
+	    if (rz <= -L2) {
+        	rz += L;
+    	    } else if (rx > L2) {
+            	rz -= L;
+    	    }
+
 
             double rij2 = rx * rx + ry * ry + rz * rz; // mult mult mult suma suma
 

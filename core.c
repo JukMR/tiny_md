@@ -4,6 +4,8 @@
 #include <math.h>
 #include <stdlib.h> // rand()
 
+
+
 #define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
 
 
@@ -80,26 +82,24 @@ static struct Coord minimum_image(struct Coord fix,  const double cell_length)
 {
     // imagen más cercana
 
-    if (fix.rx <= -0.5 * cell_length) {
-        fix.rx += cell_length;
-    } else if (fix.rx > 0.5 * cell_length) {
-        fix.rx -= cell_length;
+    if (fix.x <= -0.5 * cell_length) {
+        fix.x += cell_length;
+    } else if (fix.x > 0.5 * cell_length) {
+        fix.x -= cell_length;
     }
-    if (fix.ry <= -0.5 * cell_length) {
-        fix.ry += cell_length;
-    } else if (fix.ry > 0.5 * cell_length) {
-        fix.ry -= cell_length;
+    if (fix.y <= -0.5 * cell_length) {
+        fix.y += cell_length;
+    } else if (fix.y > 0.5 * cell_length) {
+        fix.y -= cell_length;
     }
-    if (fix.rz <= -0.5 * cell_length) {
-        fix.rz += cell_length;
-    } else if (fix.rz > 0.5 * cell_length) {
-        fix.rz -= cell_length;
+    if (fix.z <= -0.5 * cell_length) {
+        fix.z += cell_length;
+    } else if (fix.z > 0.5 * cell_length) {
+        fix.z -= cell_length;
     }
 
     return fix;
 }
-
-
 void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
             const double* temp, const double rho, const double V, const double L)
 {
@@ -144,12 +144,12 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
 
             struct Coord xyz;
             // distancia mínima entre r_i y r_j
-            xyz.rx = xi - xj;                    // resta
-            xyz.ry = yi - yj;                    // resta
-            xyz.rz = zi - zj;                    // resta
+            xyz.x = xi - xj;                    // resta
+            xyz.y = yi - yj;                    // resta
+            xyz.z = zi - zj;                    // resta
             xyz = minimum_image(xyz, L);              // mult suma
 
-            double rij2 = xyz.rx * xyz.rx + xyz.ry * xyz.ry + xyz.rz * xyz.rz; // mult mult mult suma suma
+            double rij2 = xyz.x * xyz.x + xyz.y * xyz.y + xyz.z * xyz.z; // mult mult mult suma suma
 
             if (rij2 <= rcut2) {
                 double r2inv = 1.0 / rij2;  // div
@@ -157,13 +157,13 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
 
                 double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0); // mult mult mult mult resta
 
-                fxyz[i + 0] += fr * xyz.rx; // mult suma
-                fxyz[i + 1] += fr * xyz.ry; // mult suma
-                fxyz[i + 2] += fr * xyz.rz; // mult suma
+                fxyz[i + 0] += fr * xyz.x; // mult suma
+                fxyz[i + 1] += fr * xyz.y; // mult suma
+                fxyz[i + 2] += fr * xyz.z; // mult suma
 
-                fxyz[j + 0] -= fr * xyz.rx; // mult resta
-                fxyz[j + 1] -= fr * xyz.ry; // mult resta
-                fxyz[j + 2] -= fr * xyz.rz; // mult resta
+                fxyz[j + 0] -= fr * xyz.x; // mult resta
+                fxyz[j + 1] -= fr * xyz.y; // mult resta
+                fxyz[j + 2] -= fr * xyz.z; // mult resta
 
                 *epot += 4.0 * r6inv * (r6inv - 1.0) - ECUT; // mult mult resta resta suma
                 pres_vir += fr * rij2; // mult suma

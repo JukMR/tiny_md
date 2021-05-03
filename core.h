@@ -9,6 +9,6 @@ void velocity_verlet(double* rxyz, double* vxyz, double* fxyz, double* epot,
                      double* ekin, double* pres, double* temp, const double rho,
                      const double V, const double L);
 
-struct Coord {double rx; double ry; double rz;};
+struct Coord {double x; double y; double z;};
 
 #endif

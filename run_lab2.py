@@ -107,4 +107,15 @@ result = []
 result = avg_maker('statics.res')
 print(result)
 
+# Guardar los resultados en un archivo
+try:
+    file_object = open('results.res', 'a')
+    file_object.write('Dump result values\n')
+    file_object.write('\n')
+    file_object.write(str(result))
+    file_object.close()
+except IOError:
+    print("Cannot open file")
+    sys.exit(1)
+
 plot(result[0])

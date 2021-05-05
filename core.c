@@ -4,10 +4,8 @@
 #include <math.h>
 #include <stdlib.h> // rand()
 
-#define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
 
-
-void init_pos(double* rx,double* ry,double* rz, const double rho)
+void init_pos(double* rx, double* ry, double* rz, const double rho)
 {
     // inicialización de las posiciones de los átomos en un cristal FCC
 
@@ -41,7 +39,7 @@ void init_pos(double* rx,double* ry,double* rz, const double rho)
 }
 
 
-void init_vel(double* vx,double* vy,double* vz, double* temp, double* ekin)
+void init_vel(double* vx, double* vy, double* vz, double* temp, double* ekin)
 {
     // inicialización de velocidades aleatorias
 
@@ -73,7 +71,7 @@ void init_vel(double* vx,double* vy,double* vz, double* temp, double* ekin)
     }
 }
 
-
+/*
 static double minimum_image(double cordi, const double cell_length)
 {
     // imagen más cercana
@@ -85,8 +83,8 @@ static double minimum_image(double cordi, const double cell_length)
     }
     return cordi;
 }
-
-
+ */
+/*
 void forces(const double* rx,const double* ry,const double* rz, double* fx,double* fy,double* fz, double* epot, double* pres,
             const double* temp, const double rho, const double V, const double L)
 {
@@ -122,7 +120,7 @@ void forces(const double* rx,const double* ry,const double* rz, double* fx,doubl
             // 3 mult
             // 1 div
             // 1 suma
-            // TOTAL 5 
+            // TOTAL 5
 
             // TOTAL 21 + 10 + 9 + 1 = 41 op. flotantes
             // 41 * (N * (N - 1) / 2) + 5 operaciones por llamada forces
@@ -163,8 +161,7 @@ void forces(const double* rx,const double* ry,const double* rz, double* fx,doubl
     pres_vir /= (V * 3.0); // mult div
     *pres = *temp * rho + pres_vir; // mult suma
 }
-
-
+ */
 static double pbc(double cordi, const double cell_length)
 {
     // condiciones periodicas de contorno coordenadas entre [0,L)
@@ -177,8 +174,8 @@ static double pbc(double cordi, const double cell_length)
 }
 
 
-void velocity_verlet(double* rx,double* ry,double* rz,double* vx,double* vy,double* vz, 
-                     double* fx,double* fy,double* fz,double* epot,
+void velocity_verlet(double* rx, double* ry, double* rz, double* vx, double* vy, double* vz,
+                     double* fx, double* fy, double* fz, double* epot,
                      double* ekin, double* pres, double* temp, const double rho,
                      const double V, const double L)
 {
@@ -197,7 +194,7 @@ void velocity_verlet(double* rx,double* ry,double* rz,double* vx,double* vy,doub
         vz[i] += 0.5 * fz[i] * DT;
     }
 
-    forces(rx,ry,rz, fx,fy,fz, epot, pres, temp, rho, V, L); // actualizo fuerzas
+    forces(rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L); // actualizo fuerzas
 
     double sumv2 = 0.0;
     for (int i = 0; i < N; i++) { // actualizo velocidades
@@ -205,7 +202,7 @@ void velocity_verlet(double* rx,double* ry,double* rz,double* vx,double* vy,doub
         vy[i] += 0.5 * fy[i] * DT;
         vz[i] += 0.5 * fz[i] * DT;
 
-        sumv2 += vx[i] * vx[i] + vy[i] * vy[i]+ vz[i] * vz[i];
+        sumv2 += vx[i] * vx[i] + vy[i] * vy[i] + vz[i] * vz[i];
     }
 
     *ekin = 0.5 * sumv2;

@@ -1,4 +1,4 @@
-#define _XOPEN_SOURCE 500  // M_PI
+#define _XOPEN_SOURCE 500 // M_PI
 #include "core.h"
 #include "parameters.h"
 
@@ -10,7 +10,7 @@
 // variables globales
 static double Ekin, Epot, Temp, Pres; // variables macroscopicas
 static double Rho, V, box_size, tail, Etail, Ptail;
-static double *rx,*ry,*rz, *vx,*vy,*vz, *fx,*fy,*fz; // variables microscopicas
+static double *rx, *ry, *rz, *vx, *vy, *vz, *fx, *fy, *fz; // variables microscopicas
 static double Rhob, sf, epotm, presm;
 static int switcher = 0, frames = 0, mes;
 
@@ -138,9 +138,9 @@ static void idle_func(void)
         Etail = tail * (double)N;
         Ptail = tail * Rho;
 
-        init_pos(rx,ry,rz, Rho);
-        init_vel(vx,vy,vz, &Temp, &Ekin);
-        forces(rx,ry,rz, fx,fy,fz, &Epot, &Pres, &Temp, Rho, V, box_size);
+        init_pos(rx, ry, rz, Rho);
+        init_vel(vx, vy, vz, &Temp, &Ekin);
+        forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size);
 
         switcher = 0;
 
@@ -151,7 +151,6 @@ static void idle_func(void)
 
         Rhob = Rho;
         Rho = Rho - 0.1;
-
 
         V = (double)N / Rho;
         box_size = cbrt(V);
@@ -165,8 +164,8 @@ static void idle_func(void)
             ry[k] *= sf;
             rz[k] *= sf;
         }
-        init_vel(vx,vy,vz, &Temp, &Ekin);
-        forces(rx,ry,rz, fx,fy,fz, &Epot, &Pres, &Temp, Rho, V, box_size);
+        init_vel(vx, vy, vz, &Temp, &Ekin);
+        forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size);
 
         switcher = 0;
         if (fabs(Rho - (RHOI - 0.9f)) < 1e-6) {
@@ -176,10 +175,10 @@ static void idle_func(void)
 
     } else if (switcher == 1) { // loop de medición
 
+
         for (int i = frames; i < frames + TMES; i++) {
 
-            velocity_verlet(rx,ry,rz, vx,vy,vz, fx,fy,fz, &Epot, &Ekin, &Pres, &Temp, Rho,
-                            V, box_size);
+            velocity_verlet(rx, ry, rz, vx, vy, vz, fx, fy, fz, &Epot, &Ekin, &Pres, &Temp, Rho, V, box_size);
 
             sf = sqrt(T0 / Temp);
             for (int k = 0; k < N; k++) { // reescaleo de velocidades
@@ -203,10 +202,10 @@ static void idle_func(void)
 
     } else if (switcher == 0) { // loop de equilibración
 
+
         while (frames % TEQ != 0) {
 
-            velocity_verlet(rx,ry,rz, vx,vy,vz, fx,fy,fz, &Epot, &Ekin, &Pres, &Temp, Rho,
-                            V, box_size);
+            velocity_verlet(rx, ry, rz, vx, vy, vz, fx, fy, fz, &Epot, &Ekin, &Pres, &Temp, Rho, V, box_size);
 
             sf = sqrt(T0 / Temp);
             for (int k = 0; k < N; k++) { // reescaleo de velocidades
@@ -267,18 +266,17 @@ static void open_glut_window(void)
 
 int main(int argc, char** argv)
 {
-
     glutInit(&argc, argv);
 
-    rx = (double*)malloc( N * sizeof(double));
-    ry = (double*)malloc( N * sizeof(double));
-    rz = (double*)malloc( N * sizeof(double));
-    vx = (double*)malloc( N * sizeof(double));
-    vy = (double*)malloc( N * sizeof(double));
-    vz = (double*)malloc( N * sizeof(double));
-    fx = (double*)malloc( N * sizeof(double));
-    fy = (double*)malloc( N * sizeof(double));
-    fz = (double*)malloc( N * sizeof(double));
+    rx = (double*)malloc(N * sizeof(double));
+    ry = (double*)malloc(N * sizeof(double));
+    rz = (double*)malloc(N * sizeof(double));
+    vx = (double*)malloc(N * sizeof(double));
+    vy = (double*)malloc(N * sizeof(double));
+    vz = (double*)malloc(N * sizeof(double));
+    fx = (double*)malloc(N * sizeof(double));
+    fy = (double*)malloc(N * sizeof(double));
+    fz = (double*)malloc(N * sizeof(double));
 
     // parametros iniciales para que los pueda usar (antes de modificar)
     // `idle_func`
@@ -291,9 +289,9 @@ int main(int argc, char** argv)
     Etail = tail * (double)N;
     Ptail = tail * Rho;
 
-    init_pos(rx,ry,rz, Rho);
-    init_vel(vx,vy,vz, &Temp, &Ekin);
-    forces(rx,ry,rz, fx,fy,fz, &Epot, &Pres, &Temp, Rho, V, box_size);
+    init_pos(rx, ry, rz, Rho);
+    init_vel(vx, vy, vz, &Temp, &Ekin);
+    forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size);
     //
     //
 

@@ -1,13 +1,17 @@
-CC      =  gcc-10
-CFLAGS  = -O3 -march=native -DN=500  -fopt-info-vec -fopt-info-vec-missed
+CC      =  clang
+CFLAGS  = -O0 -march=native -DN=500
 WFLAGS	= -std=c11 -Wall -Wextra -g
 LDFLAGS	= -lm
 
 TARGETS	= tiny_md viz
 SOURCES	= $(shell echo *.c)
-OBJECTS = core.o wtime.o
+OBJECTS = core.o wtime.o forces.o
 
-all: $(TARGETS)
+all: pre-build $(TARGETS)
+
+pre-build:
+	/home/julian/programs/ispc/ispc-v1.15.0-linux/bin/ispc --target=sse2-i32x4	forces.ispc -o forces.o
+
 
 viz: viz.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -lGL -lGLU -lglut

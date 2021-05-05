@@ -44,6 +44,8 @@ int main()
     Rho = RHOI;
     init_pos(rx,ry,rz, Rho);
     double start = wtime();
+
+    // double ecut = (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)));
     for (int m = 0; m < 9; m++) {
         Rhob = Rho;
         Rho = RHOI - 0.1 * (double)m;
@@ -62,7 +64,8 @@ int main()
         }
 
         init_vel(vx,vy,vz, &Temp, &Ekin);
-        forces(rx,ry,rz, fx,fy,fz, &Epot, &Pres, &Temp, Rho, cell_V, cell_L);
+        forces(rx,ry,rz, fx,fy,fz, &Epot, &Pres, &Temp, Rho,
+               cell_V, cell_L);
 
         for (i = 1; i < TEQ; i++) { // loop de equilibracion
 

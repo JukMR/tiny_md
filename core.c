@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdlib.h> // rand()
 
-
+#include "forces.h"
 void init_pos(double* rx, double* ry, double* rz, const double rho)
 {
     // inicialización de las posiciones de los átomos en un cristal FCC

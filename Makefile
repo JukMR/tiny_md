@@ -10,10 +10,11 @@ OBJECTS = core.o wtime.o forces.o
 all: pre-build $(TARGETS)
 
 pre-build:
-	$(ispc) $(ispc_flags) forces.ispc -o forces.o
+	$(ispc) $(ispc_flags) forces.ispc -o forces.o -h forces.h
 
 ispc = ispc
-ispc_flags = --target avx2-i64x4 
+ispc_flags = -g -O3 --target avx2-i64x4 --cpu=core-avx2
+
 
 viz: viz.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -lGL -lGLU -lglut

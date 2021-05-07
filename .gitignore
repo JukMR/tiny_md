@@ -1,7 +1,7 @@
 trajectory.xyz
 statics.res
 thermo.log
-result.res
+results.res
 tiny_md
 viz
 *.o

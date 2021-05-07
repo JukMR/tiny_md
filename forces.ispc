@@ -37,25 +37,25 @@ export void forces(const double uniform rx[],
 
 foreach(i = 0 ... N-1)
 {
-    fx[i] = 0.0;
-    fy[i] = 0.0;
-    fz[i] = 0.0;
+    fx[i] = 0.0d;
+    fy[i] = 0.0d;
+    fz[i] = 0.0d;
 }
 
 uniform double pres_vir;
-double pres_vir_partial = 0.0 ;
-double rcut2 = RCUT * RCUT;
+double pres_vir_partial = 0.0d ;
+uniform double rcut2 = RCUT * RCUT;
 double epot_partial = 0.0d;
 
 
 
-foreach(i = 0 ... (N-1))
+foreach(i = 0 ... N)
 {
     double xi = rx[i];
     double yi = ry[i];
     double zi = rz[i];
 
-    for (int j = i + 1; j <  N; j++)
+    for (int j = i + 1; j <  N-1; j++)
     {
         double xj = rx[j];
         double yj = ry[j];
@@ -72,10 +72,10 @@ foreach(i = 0 ... (N-1))
         double rij2 = rxd * rxd + ryd * ryd + rzd * rzd;
 
         if (rij2 <= rcut2) {
-            double r2inv = 1.0 / rij2;
+            double r2inv = 1.0d / rij2;
             double r6inv = r2inv * r2inv * r2inv;
 
-            double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0);
+            double fr = 24.0d * r2inv * r6inv * (2.0d * r6inv - 1.0d);
 
             fx[i] += fr * rxd;
             fy[i] += fr * ryd;
@@ -85,7 +85,7 @@ foreach(i = 0 ... (N-1))
             fy[j] -= fr * ryd;
             fz[j] -= fr * rzd;
 
-            epot_partial +=  4.0 * r6inv * (r6inv - 1.0) - ECUT; // revisar
+            epot_partial +=  4.0d * r6inv * (r6inv - 1.0) - ECUT; // revisar
             pres_vir_partial += fr * rij2 ;
 
         }
@@ -94,7 +94,7 @@ foreach(i = 0 ... (N-1))
 }
 *epot=reduce_add(epot_partial);
 pres_vir=reduce_add(pres_vir_partial);
-pres_vir /= (V * 3.0);
+pres_vir /= (V * 3.0d);
 *pres = *temp * rho + pres_vir; // revisar
 }
 

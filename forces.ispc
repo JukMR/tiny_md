@@ -83,6 +83,6 @@ foreach(i = 0 ... (N-1))
 }
 
 pres_vir = pres_vir / (V * 3.0);
-pres[0] += *temp * rho + pres_vir; // revisar
+pres[0] = *temp * rho + pres_vir; // revisar
 }
 

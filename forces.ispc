@@ -1,5 +1,5 @@
 #include "parameters.h"
-# define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
+#define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
 
 static double minimum_image(double cordi, const double cell_length)
 {
@@ -12,11 +12,18 @@ static double minimum_image(double cordi, const double cell_length)
     return cordi;
 }
 
-export void forces(const double* uniform rx, const double* uniform ry,
-                   const double* uniform rz, double* uniform fx,
-                   double* uniform fy, double* uniform fz,
-                   uniform double* uniform epot, double* uniform pres,
-                   const double* uniform temp, uniform const double rho, uniform const double V, uniform const double L)
+export void forces(const double uniform rx[],
+                   const double uniform ry[],
+                   const double uniform rz[],
+                   double uniform fx[],
+                   double uniform fy[],
+                   double uniform fz[],
+                   double epot[],
+                   double pres[],
+                   uniform const double uniform temp[],
+                   uniform const double rho,
+                   uniform const double V,
+                   uniform const double L)
 {
 
 foreach(i = 0 ... N-1)
@@ -28,7 +35,8 @@ foreach(i = 0 ... N-1)
 
 double pres_vir = 0.0;
 double rcut2 = RCUT * RCUT;
-double epot = 0.0;
+double epot[0] = {0.0};
+
 
 
 foreach(i = 0 ... (N-1))
@@ -67,13 +75,14 @@ foreach(i = 0 ... (N-1))
             fy[j] -= fr * ry;
             fz[j] -= fr * rz;
 
-             double *epot =  new double [4.0 * r6inv * (r6inv - 1.0) - ECUT]; // revisar
+            epot[0] =  4.0 * r6inv * (r6inv - 1.0) - ECUT; // revisar
 
         }
 
     }
 }
+
 pres_vir = pres_vir / (V * 3.0);
-double *pres =  new double [*temp * rho + pres_vir]; // revisar
+pres[0] += *temp * rho + pres_vir; // revisar
 }
 

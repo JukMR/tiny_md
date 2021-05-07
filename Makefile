@@ -1,9 +1,10 @@
 CC      =  clang
-CFLAGS  = -O0 -march=native -DN=500
+CFLAGS  = -O3 -march=native -DN=500
 WFLAGS	= -std=c11 -Wall -Wextra -g
 LDFLAGS	= -lm
-
-TARGETS	= tiny_md viz
+#CC	=  icc
+#CFLAGS  = -O3 -xHost -DN=500
+TARGETS	= tiny_md # viz
 SOURCES	= $(shell echo *.c)
 OBJECTS = core.o wtime.o forces.o
 
@@ -12,7 +13,7 @@ all: pre-build $(TARGETS)
 pre-build:
 	$(ispc) $(ispc_flags) forces.ispc -o forces.o -h forces.h
 
-ispc = ispc
+ispc = /opt/ispc/1.15.0/bin/ispc
 ispc_flags = -g -O3 --target avx2-i64x4 --cpu=core-avx2
 
 

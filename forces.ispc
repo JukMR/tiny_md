@@ -9,7 +9,7 @@
 
 #define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
 
-static double minimum_image(double cordi, const double cell_length)
+double minimum_image(double cordi, const double cell_length)
 {
     // imagen más cercana
     if (cordi <= -0.5 * cell_length) {
@@ -20,6 +20,88 @@ static double minimum_image(double cordi, const double cell_length)
     return cordi;
 }
 
+
+export void forces(const double uniform rx[],
+                   const double uniform ry[],
+                   const double uniform rz[],
+                   double uniform fx[],
+                   double uniform fy[],
+                   double uniform fz[],
+                   uniform double epot[],
+                   uniform double pres[],
+                   uniform const double uniform temp[],
+                   uniform const double rho,
+                   uniform const double V,
+                   uniform const double L)
+{
+
+foreach(i = 0 ... N-1)
+{
+    fx[i] = 0.0;
+    fy[i] = 0.0;
+    fz[i] = 0.0;
+}
+
+uniform double pres_vir;
+double pres_vir_partial = 0.0 ;
+double rcut2 = RCUT * RCUT;
+double epot_partial = 0.0d;
+
+
+
+foreach(i = 0 ... (N-1))
+{
+    double xi = rx[i];
+    double yi = ry[i];
+    double zi = rz[i];
+
+    for (int j = i + 1; j <  N; j++)
+    {
+        double xj = rx[j];
+        double yj = ry[j];
+        double zj = rz[j];
+
+
+        double rxd = xi - xj;
+        rxd = minimum_image(rxd, L);
+        double ryd = yi - yj;
+        ryd = minimum_image(ryd, L);
+        double rzd = zi - zj;
+        rzd = minimum_image(rzd, L);
+
+        double rij2 = rxd * rxd + ryd * ryd + rzd * rzd;
+
+        if (rij2 <= rcut2) {
+            double r2inv = 1.0 / rij2;
+            double r6inv = r2inv * r2inv * r2inv;
+
+            double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0);
+
+            fx[i] += fr * rxd;
+            fy[i] += fr * ryd;
+            fz[i] += fr * rzd;
+
+            fx[j] -= fr * rxd;
+            fy[j] -= fr * ryd;
+            fz[j] -= fr * rzd;
+
+            epot_partial +=  4.0 * r6inv * (r6inv - 1.0) - ECUT; // revisar
+            pres_vir_partial += fr * rij2 ;
+
+        }
+
+    }
+}
+*epot=reduce_add(epot_partial);
+pres_vir=reduce_add(pres_vir_partial);
+pres_vir /= (V * 3.0);
+*pres = *temp * rho + pres_vir; // revisar
+}
+
+
+
+
+/*
 export void forces(const double uniform rx[],
                    const double uniform ry[],
                    const double uniform rz[],
@@ -94,3 +176,4 @@ pres_vir = pres_vir / (V * 3.0);
 pres[0] = *temp * rho + pres_vir; // revisar
 }
 
+*/

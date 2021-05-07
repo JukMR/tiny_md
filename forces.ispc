@@ -1,4 +1,12 @@
-#include "parameters.h"
+// Variables necesarias
+
+#ifndef RCUT // radio de corte
+#define RCUT 2.5
+#endif
+#ifndef N // número de particulas (debe ser un 4m^3 para el cristal inicial)
+#define N 256
+#endif
+
 #define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
 
 static double minimum_image(double cordi, const double cell_length)

@@ -1,5 +1,6 @@
 trajectory.xyz
 statics.res
+thermo.log
 result.res
 tiny_md
 viz

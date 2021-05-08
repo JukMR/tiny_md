@@ -69,7 +69,7 @@ foreach(i = 0 ... N-1)
 
         double rij2 = rxd * rxd + ryd * ryd + rzd * rzd;
 
-        if (rij2 <= rcut2) {
+        cif (rij2 <= rcut2) {
             double r2inv = 1.0d / rij2;
             double r6inv = r2inv * r2inv * r2inv;
 

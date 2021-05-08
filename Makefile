@@ -11,10 +11,11 @@ OBJECTS = core.o wtime.o forces.o
 all: pre-build $(TARGETS)
 
 pre-build:
-	$(ispc) $(particles) $(ispc_flags) forces.ispc -o forces.o -h forces.h
+	$(ispc) $(ispc_flags) forces.ispc -o forces.o -h forces.h
+
 
 ispc = /opt/ispc/1.15.0/bin/ispc
-ispc_flags = -g -O3 --target=avx2-i64x4 --cpu=core-avx2
+ispc_flags = -g -O3 --target=avx2-i64x4 --cpu=core-avx2 $(particles)
 
 particles = -DN=500
 

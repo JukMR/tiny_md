@@ -11,6 +11,7 @@
 #include <time.h> // time(NULL)
 
 
+// Esta macro tambien esta definida en forces.ispc
 #ifndef N // número de particulas (debe ser un 4m^3 para el cristal inicial)
 #define N 256
 #endif
@@ -27,6 +28,7 @@
 #define RHOI 1.2
 #endif
 
+// Esta macro tambien esta definida en forces.ispc
 #ifndef RCUT // radio de corte
 #define RCUT 2.5
 #endif

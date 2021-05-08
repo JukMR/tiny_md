@@ -27,15 +27,15 @@ export void forces(const double uniform rx[],
                    double uniform fx[],
                    double uniform fy[],
                    double uniform fz[],
-                   uniform double epot[],
-                   uniform double pres[],
+                   uniform double uniform epot[],
+                   uniform double uniform pres[],
                    uniform const double uniform temp[],
                    uniform const double rho,
                    uniform const double V,
                    uniform const double L)
 {
 
-foreach(i = 0 ... N-1)
+foreach(i = 0 ... N)
 {
     fx[i] = 0.0d;
     fy[i] = 0.0d;
@@ -85,7 +85,7 @@ foreach(i = 0 ... N)
             fy[j] -= fr * ryd;
             fz[j] -= fr * rzd;
 
-            epot_partial +=  4.0d * r6inv * (r6inv - 1.0) - ECUT; // revisar
+            epot_partial +=  4.0d * r6inv * (r6inv - 1.0d) - ECUT;
             pres_vir_partial += fr * rij2 ;
 
         }
@@ -95,85 +95,6 @@ foreach(i = 0 ... N)
 *epot=reduce_add(epot_partial);
 pres_vir=reduce_add(pres_vir_partial);
 pres_vir /= (V * 3.0d);
-*pres = *temp * rho + pres_vir; // revisar
+*pres = *temp * rho + pres_vir;
 }
 
-
-
-
-/*
-export void forces(const double uniform rx[],
-                   const double uniform ry[],
-                   const double uniform rz[],
-                   double uniform fx[],
-                   double uniform fy[],
-                   double uniform fz[],
-                   double epot[],
-                   double pres[],
-                   uniform const double uniform temp[],
-                   uniform const double rho,
-                   uniform const double V,
-                   uniform const double L)
-{
-
-foreach(i = 0 ... N-1)
-{
-    fx[i] = 0.0;
-    fy[i] = 0.0;
-    fz[i] = 0.0;
-}
-
-double pres_vir = 0.0;
-double rcut2 = RCUT * RCUT;
-double epot[0] = {0.0};
-
-
-
-foreach(i = 0 ... (N-1))
-{
-    double xi = rx[i];
-    double yi = ry[i];
-    double zi = rz[i];
-
-    for (int j = i + 1; j <  N; j++)
-    {
-        double xj = rx[j];
-        double yj = ry[j];
-        double zj = rz[j];
-
-
-        double rx = xi - xj;
-        rx = minimum_image(rx, L);
-        double ry = yi - yj;
-        ry = minimum_image(ry, L);
-        double rz = zi - zj;
-        rz = minimum_image(rz, L);
-
-        double rij2 = rx * rx + ry * ry + rz * rz;
-
-        if (rij2 <= rcut2) {
-            double r2inv = 1.0 / rij2;
-            double r6inv = r2inv * r2inv * r2inv;
-
-            double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0);
-
-            fx[i] += fr * rx;
-            fy[i] += fr * ry;
-            fz[i] += fr * rz;
-
-            fx[j] -= fr * rx;
-            fy[j] -= fr * ry;
-            fz[j] -= fr * rz;
-
-            epot[0] =  4.0 * r6inv * (r6inv - 1.0) - ECUT; // revisar
-
-        }
-
-    }
-}
-
-pres_vir = pres_vir / (V * 3.0);
-pres[0] = *temp * rho + pres_vir; // revisar
-}
-
-*/

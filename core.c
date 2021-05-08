@@ -71,97 +71,6 @@ void init_vel(double* vx, double* vy, double* vz, double* temp, double* ekin)
     }
 }
 
-/*
-static double minimum_image(double cordi, const double cell_length)
-{
-    // imagen más cercana
-
-    if (cordi <= -0.5 * cell_length) {
-        cordi += cell_length;
-    } else if (cordi > 0.5 * cell_length) {
-        cordi -= cell_length;
-    }
-    return cordi;
-}
- */
-/*
-void forces(const double* rx,const double* ry,const double* rz, double* fx,double* fy,double* fz, double* epot, double* pres,
-            const double* temp, const double rho, const double V, const double L)
-{
-    // calcula las fuerzas LJ (12-6)
-
-    for (int i = 0; i <  N; i++) {
-        fx[i] = 0.0;
-        fy[i] = 0.0;
-        fz[i] = 0.0;
-    }
-    double pres_vir = 0.0;
-    double rcut2 = RCUT * RCUT; // mult
-    *epot = 0.0;
-
-    // (N - 1) iteraciones
-    for (int i = 0; i < (N - 1); i++) {
-
-        double xi = rx[i];
-        double yi = ry[i];
-        double zi = rz[i];
-
-        // (N - i - 1)  iteraciones
-        for (int j = i + 1; j <  N; j++) {
-
-            // Dentro del ciclo
-            // 21 mult
-            // 10 suma
-            // 9 resta
-            // 1 div
-            // TOTAL 41
-
-            // Fuera del ciclo
-            // 3 mult
-            // 1 div
-            // 1 suma
-            // TOTAL 5
-
-            // TOTAL 21 + 10 + 9 + 1 = 41 op. flotantes
-            // 41 * (N * (N - 1) / 2) + 5 operaciones por llamada forces
-
-            double xj = rx[j];
-            double yj = ry[j];
-            double zj = rz[j];
-
-            // distancia mínima entre r_i y r_j
-            double rx = xi - xj;                    // resta
-            rx = minimum_image(rx, L);              // mult suma
-            double ry = yi - yj;                    // resta
-            ry = minimum_image(ry, L);              // mult suma
-            double rz = zi - zj;                    // resta
-            rz = minimum_image(rz, L);              // mult suma
-
-            double rij2 = rx * rx + ry * ry + rz * rz; // mult mult mult suma suma
-
-            if (rij2 <= rcut2) {
-                double r2inv = 1.0 / rij2;  // div
-                double r6inv = r2inv * r2inv * r2inv; // mult mult
-
-                double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0); // mult mult mult mult resta
-
-                fx[i] += fr * rx; // mult suma
-                fy[i] += fr * ry; // mult suma
-                fz[i] += fr * rz; // mult suma
-
-                fx[j] -= fr * rx; // mult resta
-                fy[j] -= fr * ry; // mult resta
-                fz[j] -= fr * rz; // mult resta
-
-                *epot += 4.0 * r6inv * (r6inv - 1.0) - ECUT; // mult mult resta resta suma
-                pres_vir += fr * rij2; // mult suma
-            }
-        }
-    }
-    pres_vir /= (V * 3.0); // mult div
-    *pres = *temp * rho + pres_vir; // mult suma
-}
- */
 static double pbc(double cordi, const double cell_length)
 {
     // condiciones periodicas de contorno coordenadas entre [0,L)
@@ -174,10 +83,11 @@ static double pbc(double cordi, const double cell_length)
 }
 
 
-void velocity_verlet(double* rx, double* ry, double* rz, double* vx, double* vy, double* vz,
-                     double* fx, double* fy, double* fz, double* epot,
-                     double* ekin, double* pres, double* temp, const double rho,
-                     const double V, const double L)
+void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
+                     double* vy, double* vz, double* fx, double* fy,
+                     double* fz, double* epot, double* ekin, double* pres,
+                     double* temp, const double rho, const double V,
+                     const double L)
 {
 
     for (int i = 0; i < N; i++) { // actualizo posiciones

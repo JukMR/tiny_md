@@ -34,6 +34,7 @@ export void forces(const double uniform rx[],
                    uniform const double V,
                    uniform const double L)
 {
+
 foreach(i = 0 ... N)
 {
     fx[i] = 0.0d;
@@ -47,7 +48,6 @@ uniform double rcut2 = RCUT * RCUT;
 double epot_partial = 0.0d;
 
 
-
 foreach(i = 0 ... N-1)
 {
     double xi = rx[i];
@@ -59,7 +59,6 @@ foreach(i = 0 ... N-1)
         double xj = rx[j];
         double yj = ry[j];
         double zj = rz[j];
-
 
         double rxd = xi - xj;
         rxd = minimum_image(rxd, L);
@@ -86,14 +85,14 @@ foreach(i = 0 ... N-1)
 
             epot_partial +=  4.0d * r6inv * (r6inv - 1.0d) - ECUT;
             pres_vir_partial += fr * rij2 ;
-
         }
-
     }
 }
+
 *epot=reduce_add(epot_partial);
 pres_vir=reduce_add(pres_vir_partial);
 pres_vir /= (V * 3.0d);
 *pres = *temp * rho + pres_vir;
+
 }
 

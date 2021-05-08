@@ -34,7 +34,6 @@ export void forces(const double uniform rx[],
                    uniform const double V,
                    uniform const double L)
 {
-
 foreach(i = 0 ... N)
 {
     fx[i] = 0.0d;
@@ -49,13 +48,13 @@ double epot_partial = 0.0d;
 
 
 
-foreach(i = 0 ... N)
+foreach(i = 0 ... N-1)
 {
     double xi = rx[i];
     double yi = ry[i];
     double zi = rz[i];
 
-    for (int j = i + 1; j <  N-1; j++)
+    for (int j = i + 1; j <  N; j++)
     {
         double xj = rx[j];
         double yj = ry[j];

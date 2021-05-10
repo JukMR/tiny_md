@@ -163,7 +163,23 @@ En la siguiente figura se muestran los resultados para las diferentes versiónes
 * `SoA` es la versión con estructura de arreglos
 * `ispc` es la versión con forces y minimum image implementadas en ISPC.
 ![compiladores](pictures/compiladores.png)
-Se observa el aumento del 70% para los compiladores clang, gcc y icc al utilizar la versión ISPC, en cambio para el compilador clang de intel los resultados son iguales para todas las versiones.
+Se observa el aumento del 50% para los compiladores clang, gcc y icc al utilizar la versión ISPC, en cambio para el compilador clang de intel los resultados son iguales para todas las versiones.
+
+|          | CFLAG                          | time  | GFLOPS | insn |
+|----------|--------------------------------|-------|--------|------|
+| Original | (intel)clang -O3 -march=native | 13.13 | 0.78   | 1.59 |
+|          | clang -O3 -march=native        | 23.45 | 0.44   | 1.02 |
+|          | gcc-5 -O3 -march=native        | 23.00 | 0.45   | 1.05 |
+|          | icc -O3 -xHost                 | 24.30 | 0.42   | 1.07 |
+| SoA      | (intel)clang -O3 -march=native | 13.83 | 0.74   | 1.71 |
+|          | clang -O3 -march=native        | 23.19 | 0.44   | 1.03 |
+|          | gcc-5 -O3 -march=native        | 23.12 | 0.44   | 1.04 |
+|          | icc -O3 -xHost                 | 23.36 | 0.44   | 1.02 |
+| ISPC     | (intel)clang -O3 -march=native | 12.86 | 0.80   | 1.28 |
+|          | clang -O3 -march=native        | 13.41 | 0.73   | 1.23 |
+|          | gcc-5 -O3 -march=native        | 12.88 | 0.80   | 1.28 |
+|          | icc -O3 -xHost                 | 12.8  | 0.79   | 1.28 |
+
 
 En la siguiente imagen se muestra la escalabilidad del problema, es decir el tiempo, los GFLOPS y el insn para diferentes tamaños de muestra N.
 ![varNispc](pictures/varNispc.png)

@@ -1,0 +1,5 @@
+CFLAG   time    stdevtime GFLOPS insn
+(intel)clang -O3 -march=native,12.8557,0.0137,0.796823,1.28
+clang -O3,13.412,0.565,0.732128,1.23
+gcc-5 -O3 -march=native,12.881,0.116,0.801688,1.28
+icc -O3 -xHost,12.8171,0.0579,0.794734,1.28

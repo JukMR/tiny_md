@@ -1,0 +1,6 @@
+cflag , time , errtime , gflops , insn
+(intel)clang -O3 -march=native -DN=250,4.0557,0.0798,0.673646,1.28
+(intel)clang -O3 -march=native -DN=500,14.051,0.903,0.778352,1.30
+(intel)clang -O3 -march=native -DN=1372,81.19,6.51,1.032947,1.45
+(intel)clang -O3 -march=native -DN=2048,159.45,5.52,1.116802,1.51
+(intel)clang -O3 -march=native -DN=4000,532.1610,0.0224,1.232450,1.62

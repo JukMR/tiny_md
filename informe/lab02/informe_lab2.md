@@ -158,6 +158,16 @@ Para poder obtener el mejor resultado de la nueva implementacion del programa, u
 
 
 # Resultados
+En la siguiente figura se muestran los resultados para las diferentes versiónes de código y diferentes compiladores,
+* `orig` significa la versión original sin ninguna modificación
+* `SoA` es la versión con estructura de arreglos
+* `ispc` es la versión con forces y minimum image implementadas en ISPC.
+![compiladores](pictures/compiladores.png)
+Se observa el aumento del 70% para los compiladores clang, gcc y icc al utilizar la versión ISPC, en cambio para el compilador clang de intel los resultados son iguales para todas las versiones.
+
+En la siguiente imagen se muestra la escalabilidad del problema, es decir el tiempo, los GFLOPS y el insn para diferentes tamaños de muestra N.
+![varNispc](pictures/varNispc.png)
+
 
 # Conclusiones
 

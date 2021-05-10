@@ -1,3 +1,7 @@
+trajectory.xyz
+statics.res
+thermo.log
+results.res
 tiny_md
 viz
 *.o

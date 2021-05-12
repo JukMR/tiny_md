@@ -1,5 +1,5 @@
 ## Computación Paralela. Laboratorio II. Tiny_MD
-## González Federico(i); Mérida Julián(j)
+## Gonzalez Federico(i); Mérida Julián(j)
 
 (i) Universidad Nacional de Rosario; (j) Universidad Nacional de Córdoba
 
@@ -16,7 +16,7 @@ la función forces.
 
 Estas ideas no funcionaron así que proseguimos a implementar el problema central
 del proyecto, la ejecución de la función `forces`, en ISPC. Una vez hecho esto
-conseguimos vectorizar consiguiendo una mejora aproximada del 70% con respecto a
+conseguimos vectorizar consiguiendo una mejora aproximada del 56% con respecto a
 los mejores resultados del lab 1.
 
 Por último, mientras estábamos obteniendo las métricas, descubrimos que al
@@ -25,9 +25,9 @@ herramientas oneApi(_Intel(R) oneAPI DPC++ Compiler 2021.2.0_) el problema se
 resolvía por si solo ya que este compilador si podía vectorizar forces
 automáticamente, tanto para las versiones del código AoS como SoA. Es decir con
 Clang de Intel utilizando el programa original (sin ninguna modificación)
-conseguimos la misma performance que usando ISPC. En cunto al uso de ISPC en
-este problema, la ventaja que pudimos obervar es que podemos lograr la mejora
-del 70% con cualquier compilador.
+conseguimos la misma performance que usando ISPC. En cuanto al uso de ISPC en
+este problema, la ventaja que pudimos observar es que podemos lograr la mejora
+del 56% independientemente del compilador utilizado.
 
 
 # Optimizaciones
@@ -52,7 +52,7 @@ de `core.c`, vemos que el compilador no está vectorizando ningún ciclo.
 
 ## Ayudas al compilador
 
-Intentamos pasarle el parametro `#pragma loop distribute(enable)` pero el
+Intentamos pasarle el parámetro `#pragma loop distribute(enable)` pero el
 mensaje siguió siendo el mismo. Luego probamos modificando la estructura
 original de `Array of Structures` a `Structures of Array`. Así, ahora la función
 forces recibe 6 arreglos:
@@ -76,17 +76,17 @@ vez más, no hubo éxito.
 ## Implementación de forces en ISPC
 
 Si bien no pudimos lograr que autovectorice con la versión SoA,
-gracias a esta modificación la implementación en ISPC es un poco más simple. En
-base a la versión SoA
+esta modificación ayudó para realizar la implementación en ISPC. En
+base a la versión SoA realizamos:
 
-* Primero implementamos `minimum_image` en `ISPC` ya que esta se llama en `forces`
+* Primero implementamos `minimum_image` en `ISPC` ya que ésta se llama en `forces`
 y queremos que también se vectorice. Su implementación es igual al código
 original (únicamente tuvimos que quitar `static` en el return de la función).
 Como dentro de la función solo se hace una comparación, es totalmente
 paralelizable.
 
 * Y para la implementación de `forces` a continuación vemos su
-implementación de forces.
+implementación en ISPC:
 
 ```C
 export void forces(const double uniform rx[], const double uniform ry[],
@@ -174,18 +174,18 @@ programa daría un mejor rendimiento.
 
 Al probarlo, utilizando `perf record` y `perf report` pudimos ver que la
 instrucción más cargada en el caso del if es `vfmadd231pd`, la cual constituye
-el 3.90% del total de ciclos de ejecución de la función forces.
+el 3.90% del total de ciclos de ejecución de la función `forces`.
 
 ![Instrucción más cargada if ](pictures/perf-with-if.png)
 
-Y para el caso del cif, reemplazando la linea `if (rij2 <= rcut2)` por `cif
-(rij2 <= rcut2)` ahora la instruccion con mas ejecución es `vmaskmovpd` con un
-tiempo de ejecución casi idéntico de 3.91 % de ejecución.
+Y para el caso del cif, reemplazando la línea `if (rij2 <= rcut2)` por `cif
+(rij2 <= rcut2)` encontramos que la instrucción con mas ejecución es `vmaskmovpd`, con un
+porcentaje de tiempo de ejecución casi idéntico de 3.91%.
 
 ![Instrucción más cargada cif](pictures/perf-with-cif.png)
 
-Aunque las dos instrucciones tengan el mismo porcentaje de llamada los
-resultados muestran que el código resultante al implementar el `coherent if` es
+Aunque las dos instrucciones tengan el mismo porcentaje, los
+resultados muestran que el código que implementa el `coherent if` es
 mucho más inestable.
 
 Al realizar 10 simulaciones para cada caso, obtuvimos la siguiente gráfica:
@@ -217,7 +217,7 @@ prestaciones
 CPU:
 
  * Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.4
- * 14 cores, 28 threads,
+ * 28 cores, 56 threads con smt habilitado,
  * Proccesor frequency : 2.4 - 3.3 GHz
  * Caches:
     * L1 data: 896 KiB
@@ -231,7 +231,7 @@ Memoria:
 
 ## Compiladores
 
-Para poder obtener el mejor resultado de la nueva implementacion del programa,
+Para poder obtener el mejor resultado de la nueva implementación del programa,
 usamos las siguientes versiones de compiladores:
 
 * Intel(R) oneAPI DPC++ Compiler 2021.2.0 (Intel oneApi Clang)}
@@ -243,18 +243,18 @@ usamos las siguientes versiones de compiladores:
 
 # Resultados
 
-En la siguiente figura se muestran los resultados para las diferentes versiónes
+En la siguiente figura se muestran los resultados para las diferentes versiones
 de código y diferentes compiladores con un tamaño de simulación N=500 para todos
 los casos.
 
-* `orig` significa la versión original sin ninguna modificación.
+* `orig` es la versión original sin ninguna modificación.
 * `SoA` es la versión con estructura de arreglos.
-* `ispc` es la versión con forces y minimum image implementadas en ISPC.
+* `ispc` es la versión con `forces` y `minimum_image` implementadas en ISPC.
 
-![Metricas para los distintos compiladores](pictures/compiladores.png)
+![Métricas para los distintos compiladores](pictures/compiladores.png)
 
 
-## Metricas obtenidas
+## Métricas obtenidas
 
 ### Original
 
@@ -297,7 +297,7 @@ iguales para todas las versiones.
 En la siguiente imagen se muestra la escalabilidad del problema, es decir el
 tiempo, los GFLOPS y el insn para diferentes tamaños de muestra N.
 
-![Variacion para diferentes tamaños de muestras](pictures/varNispc.png)
+![Variación para diferentes tamaños de muestras](pictures/varNispc.png)
 
 ## Metricas
 
@@ -316,15 +316,15 @@ Laboratorio 1:
 
 * Usando GCC
 * 0.45 GFlops
-* Sobre codigo original
-* Tamaño de simulacion N=500
+* Sobre código original
+* Tamaño de simulación N=500
 
 Laboratorio 2:
 
 * Usando DPC++ Clang Intel OneApi
 * 0.80 GFLops
-* Sobre version con forces implementada en ISPC
-* Tamaño de simulacion N=500
+* Sobre versión con forces implementada en ISPC
+* Tamaño de simulación N=500
 
 
 Esto en total representa una mejora aproximada de un x1.56 o un 56 % más de Gflops.

@@ -43,7 +43,7 @@ intentar encontrar donde estaban los problemas al vectorizar:
 
 Y obtuvimos los siguientes datos:
 
-![analisis_clang](pictures/analisis_clang.png)
+![Analisis código vectorizable Clang](pictures/analisis_clang.png)
 
 En estas líneas, sabiendo que la función forces va desde las líneas 91 hasta 164
 de `core.c`, vemos que el compilador no está vectorizando ningún ciclo.
@@ -176,13 +176,13 @@ Al probarlo, utilizando `perf record` y `perf report` pudimos ver que la
 instrucción más cargada en el caso del if es `vfmadd231pd`, la cual constituye
 el 3.90% del total de ciclos de ejecución de la función forces.
 
-![vfmadd231pd](pictures/perf-with-if.png)
+![Instrucción más cargada if ](pictures/perf-with-if.png)
 
 Y para el caso del cif, reemplazando la linea `if (rij2 <= rcut2)` por `cif
 (rij2 <= rcut2)` ahora la instruccion con mas ejecución es `vmaskmovpd` con un
 tiempo de ejecución casi idéntico de 3.91 % de ejecución.
 
-![vmaskmovpd](pictures/perf-with-cif.png)
+![Instrucción más cargada cif](pictures/perf-with-cif.png)
 
 Aunque las dos instrucciones tengan el mismo porcentaje de llamada los
 resultados muestran que el código resultante al implementar el `coherent if` es
@@ -190,7 +190,7 @@ mucho más inestable.
 
 Al realizar 10 simulaciones para cada caso, obtuvimos la siguiente gráfica:
 
-![cif_vs_if](pictures/cif_vs_if.png)
+![Simulación Cif vs If](pictures/cif_vs_if.png)
 
 Por lo tanto, concluimos que utilizar el cif no era conveniente para esta
 implementación, ya que en la mayoría de casos su desempeño fue peor al del if.
@@ -251,7 +251,7 @@ los casos.
 * `SoA` es la versión con estructura de arreglos.
 * `ispc` es la versión con forces y minimum image implementadas en ISPC.
 
-![compiladores](pictures/compiladores.png)
+![Metricas para los distintos compiladores](pictures/compiladores.png)
 
 
 ## Metricas obtenidas
@@ -297,7 +297,7 @@ iguales para todas las versiones.
 En la siguiente imagen se muestra la escalabilidad del problema, es decir el
 tiempo, los GFLOPS y el insn para diferentes tamaños de muestra N.
 
-![varNispc](pictures/varNispc.png)
+![Variacion para diferentes tamaños de muestras](pictures/varNispc.png)
 
 ## Metricas
 
@@ -330,7 +330,7 @@ Laboratorio 2:
 Esto en total representa una mejora aproximada de un x1.56 o un 56 % más de Gflops.
 
 
-![Lab1_vs_lab2](pictures/lab1_vs_lab2.png)
+![Lab1 vs lab2](pictures/lab1_vs_lab2.png)
 
 
 # Conclusiones

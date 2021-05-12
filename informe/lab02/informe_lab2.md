@@ -1,5 +1,5 @@
 ## Computación Paralela. Laboratorio II. Tiny_MD
-## Gonzalez Federico(i); Mérida Julián(j)
+## González Federico(i); Mérida Julián(j)
 
 (i) Universidad Nacional de Rosario; (j) Universidad Nacional de Córdoba
 
@@ -34,7 +34,7 @@ del 56% independientemente del compilador utilizado.
 
 ## Análisis código auto vectorizable con Clang
 
-Nuestro primer intento consistió en correr Clang con las siguientes flags para
+Nuestro primer intento consistió en correr clang con las siguientes flags para
 intentar encontrar donde estaban los problemas al vectorizar:
 
 * -Rpass=loop-vectorize
@@ -43,7 +43,7 @@ intentar encontrar donde estaban los problemas al vectorizar:
 
 Y obtuvimos los siguientes datos:
 
-![Analisis código vectorizable Clang](pictures/analisis_clang.png)
+![Análisis código vectorizable Clang](pictures/analisis_clang.png)
 
 En estas líneas, sabiendo que la función forces va desde las líneas 91 hasta 164
 de `core.c`, vemos que el compilador no está vectorizando ningún ciclo.
@@ -57,10 +57,10 @@ mensaje siguió siendo el mismo. Luego probamos modificando la estructura
 original de `Array of Structures` a `Structures of Array`. Así, ahora la función
 forces recibe 6 arreglos:
 
-*  3 arreglos rx, ry, y rz para las posiciones de las particulas, en vez de un arreglo rxyz.
-*  3 arreglos fx, fy, y fz para las fuerzas de las particulas, en vez un fxyz.
+*  3 arreglos rx, ry, y rz para las posiciones de las partículas, en vez de un arreglo rxyz.
+*  3 arreglos fx, fy, y fz para las fuerzas de las partículas, en vez un fxyz.
 
-Pero el resultado fue el mismo, clang informa que no pudo vectorizar ningún
+Pero el resultado fue el mismo, Clang informa que no pudo vectorizar ningún
 loop. Esto mismo fue verificado con compiladores intel y gcc dando resultados
 también negativos.
 
@@ -169,7 +169,7 @@ variables de entrada que toma la función.
 ## Intento de mejora implementación ISPC
 
 Una mejora que quisimos implementar fue reemplazar el if del segundo ciclo por
-un cif, ya que pensabamos que este camino se toma más veces y por lo tanto el
+un cif, ya que pensábamos que este camino se toma más veces y por lo tanto el
 programa daría un mejor rendimiento.
 
 Al probarlo, utilizando `perf record` y `perf report` pudimos ver que la
@@ -178,9 +178,9 @@ el 3.90% del total de ciclos de ejecución de la función `forces`.
 
 ![Instrucción más cargada if ](pictures/perf-with-if.png)
 
-Y para el caso del cif, reemplazando la línea `if (rij2 <= rcut2)` por `cif
-(rij2 <= rcut2)` encontramos que la instrucción con mas ejecución es `vmaskmovpd`, con un
-porcentaje de tiempo de ejecución casi idéntico de 3.91%.
+Y para el caso del cif, reemplazando la línea `if (rij2 <= rcut2)` por
+`cif (rij2 <= rcut2)` encontramos que la instrucción con mas ejecución es
+`vmaskmovpd`, con un porcentaje de tiempo de ejecución casi idéntico de 3.91%.
 
 ![Instrucción más cargada cif](pictures/perf-with-cif.png)
 
@@ -200,7 +200,7 @@ implementación, ya que en la mayoría de casos su desempeño fue peor al del if
 
 Cuando estábamos realizando simulaciones para obtener las métricas finales de
 este informe, notamos que luego de setear las variables en `setvars.sh` para
-usar `icc` la llamada a clang se sobreescribía con el compilador `DPC++ Intel
+usar `icc` la llamada a clang se sobrescribía con el compilador `DPC++ Intel
 oneApi Clang`.
 
 Al probarlo vimos que este compilador autovectorizaba tanto las versiones AoS y
@@ -218,7 +218,7 @@ CPU:
 
  * Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.4
  * 28 cores, 56 threads con smt habilitado,
- * Proccesor frequency : 2.4 - 3.3 GHz
+ * Processor frequency : 2.4 - 3.3 GHz
  * Caches:
     * L1 data: 896 KiB
     * L1 instr.: 896 KiB
@@ -235,9 +235,9 @@ Para poder obtener el mejor resultado de la nueva implementación del programa,
 usamos las siguientes versiones de compiladores:
 
 * Intel(R) oneAPI DPC++ Compiler 2021.2.0 (Intel oneApi Clang)}
-* Debian clang version 11.0.1-2}
+* Debian Clang version 11.0.1-2}
 * GCC versión 5.4.1-4}
-* ICC 2021.2.0 (sgcc version 10.2.1 compatibility)}
+* ICC 2021.2.0 (gcc version 10.2.1 compatibility)}
 
 
 
@@ -247,9 +247,9 @@ En la siguiente figura se muestran los resultados para las diferentes versiones
 de código y diferentes compiladores con un tamaño de simulación N=500 para todos
 los casos.
 
-* `orig` es la versión original sin ninguna modificación.
+* `Original` es la versión original sin ninguna modificación.
 * `SoA` es la versión con estructura de arreglos.
-* `ispc` es la versión con `forces` y `minimum_image` implementadas en ISPC.
+* `ISPC` es la versión con `forces` y `minimum_image` implementadas en ISPC.
 
 ![Métricas para los distintos compiladores](pictures/compiladores.png)
 
@@ -299,7 +299,7 @@ tiempo, los GFLOPS y el insn para diferentes tamaños de muestra N.
 
 ![Variación para diferentes tamaños de muestras](pictures/varNispc.png)
 
-## Metricas
+## Métricas
 
 |  CFLAG                                  |  Time     |  errtime |   GFLOPS   | Insn  |
 | :-------------------------------------  | :-------: | :-----:  | :--------: | :---: |

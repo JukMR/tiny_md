@@ -6,18 +6,36 @@
 
 # Introducción
 
-En este laboratorio buscamos alternativas para conseguir utilizar el conjunto de instrucciones vectoriales Avx2 para mejorar la performance de nuestro problema `Tiny Molecular Dinamics`. En un primer intento tratamos de ayudar al compilador a vectorizar automáticamente cambiando la estructura de datos del problema de AoS a Soa, simplificando funciones inline y pasando distintas flags para identificar donde el compilador no podía vectorizar, principalmente analizamos la función forces.
+En este laboratorio buscamos alternativas para conseguir utilizar el conjunto de
+instrucciones vectoriales Avx2 para mejorar la performance de nuestro problema
+`Tiny Molecular Dinamics`. En un primer intento tratamos de ayudar al compilador
+a vectorizar automáticamente cambiando la estructura de datos del problema de
+AoS a Soa, simplificando funciones inline y pasando distintas flags para
+identificar donde el compilador no podía vectorizar, principalmente analizamos
+la función forces.
 
-Estas ideas no funcionaron así que proseguimos a implementar el problema central del proyecto, la ejecución de la función `forces`, en ISPC. Una vez hecho esto conseguimos vectorizar consiguiendo una mejora aproximada del 70% con respecto a los mejores resultados del lab 1.
+Estas ideas no funcionaron así que proseguimos a implementar el problema central
+del proyecto, la ejecución de la función `forces`, en ISPC. Una vez hecho esto
+conseguimos vectorizar consiguiendo una mejora aproximada del 70% con respecto a
+los mejores resultados del lab 1.
 
-Por último, mientras estábamos obteniendo las métricas, descubrimos que al utilizar el compilador Clang de Intel que viene dentro del conjunto de herramientas oneApi(_Intel(R) oneAPI DPC++ Compiler 2021.2.0_) el problema se resolvía por si solo ya que este compilador si podía vectorizar forces automáticamente, tanto para las versiones del código AoS como SoA. Es decir con Clang de Intel utilizando el programa original (sin ninguna modificación) conseguimos la misma performance que usando ISPC. En cunto al uso de ISPC en este problema, la ventaja que pudimos obervar es que podemos lograr la mejora del 70% con cualquier compilador.
+Por último, mientras estábamos obteniendo las métricas, descubrimos que al
+utilizar el compilador Clang de Intel que viene dentro del conjunto de
+herramientas oneApi(_Intel(R) oneAPI DPC++ Compiler 2021.2.0_) el problema se
+resolvía por si solo ya que este compilador si podía vectorizar forces
+automáticamente, tanto para las versiones del código AoS como SoA. Es decir con
+Clang de Intel utilizando el programa original (sin ninguna modificación)
+conseguimos la misma performance que usando ISPC. En cunto al uso de ISPC en
+este problema, la ventaja que pudimos obervar es que podemos lograr la mejora
+del 70% con cualquier compilador.
 
 
 # Optimizaciones
 
 ## Análisis código auto vectorizable con Clang
 
-Nuestro primer intento consistió en correr Clang con las siguientes flags para intentar encontrar donde estaban los problemas al vectorizar:
+Nuestro primer intento consistió en correr Clang con las siguientes flags para
+intentar encontrar donde estaban los problemas al vectorizar:
 
 * -Rpass=loop-vectorize
 * -Rpass-missed=loop-vectorize
@@ -27,25 +45,48 @@ Y obtuvimos los siguientes datos:
 
 ![analisis_clang](pictures/analisis_clang.png)
 
-En estas líneas, sabiendo que la función forces va desde las líneas 91 hasta 164 de `core.c`, vemos que el compilador no está vectorizando ningún ciclo.
+En estas líneas, sabiendo que la función forces va desde las líneas 91 hasta 164
+de `core.c`, vemos que el compilador no está vectorizando ningún ciclo.
+
+
 
 ## Ayudas al compilador
 
-Intentamos pasarle el parametro `#pragma loop distribute(enable)` pero el mensaje siguió siendo el mismo. Luego probamos modificando la estructura original de `Array of Structures` a `Structures of Array`. Así, ahora la función forces recibe 6 arreglos:
+Intentamos pasarle el parametro `#pragma loop distribute(enable)` pero el
+mensaje siguió siendo el mismo. Luego probamos modificando la estructura
+original de `Array of Structures` a `Structures of Array`. Así, ahora la función
+forces recibe 6 arreglos:
 
 *  3 arreglos rx, ry, y rz para las posiciones de las particulas, en vez de un arreglo rxyz.
 *  3 arreglos fx, fy, y fz para las fuerzas de las particulas, en vez un fxyz.
 
-Pero el resultado fue el mismo, clang informa que no pudo vectorizar ningún loop. Esto mismo fue verificado con
-compiladores intel y gcc dando resultados también negativos.
+Pero el resultado fue el mismo, clang informa que no pudo vectorizar ningún
+loop. Esto mismo fue verificado con compiladores intel y gcc dando resultados
+también negativos.
 
-Por último, antes de implementar `forces` en `ISPC`, probamos transformar `minimum_image` en una función inline dentro de forces pensando que quizás esta era una causa por la que el compilador tenía problemas para vectorizar, pero una vez más, no hubo éxito.
+Por último, antes de implementar `forces` en `ISPC`, probamos transformar
+`minimum_image` en una función inline dentro de forces pensando que quizás esta
+era una causa por la que el compilador tenía problemas para vectorizar, pero una
+vez más, no hubo éxito.
+
+
+
+
 
 ## Implementación de forces en ISPC
 
-Primero implementamos `minimum_image` en `ISPC` ya que esta se llama en `forces` y queremos que también se vectorice. Su implementación es igual al código original (únicamente tuvimos que quitar `static` en el return de la función). Como dentro de la función solo se hace una comparación, es totalmente paralelizable.
+Si bien no pudimos lograr que autovectorice con la versión SoA,
+gracias a esta modificación la implementación en ISPC es un poco más simple. En
+base a la versión SoA
 
-En cuanto a la implementación de `forces` partimos como base de la versión SoA, que resulta más sencilla de paralelizar, a continuación vemos la nueva implementación de forces.
+* Primero implementamos `minimum_image` en `ISPC` ya que esta se llama en `forces`
+y queremos que también se vectorice. Su implementación es igual al código
+original (únicamente tuvimos que quitar `static` en el return de la función).
+Como dentro de la función solo se hace una comparación, es totalmente
+paralelizable.
+
+* Y para la implementación de `forces` a continuación vemos su
+implementación de forces.
 
 ```C
 export void forces(const double uniform rx[], const double uniform ry[],
@@ -118,36 +159,80 @@ pres_vir /= (V * 3.0d);
 }
 ```
 
-El código implementado es muy similar al original salvo que es necesario hacer el `reduce` de todas las sumas parciales que se calculan en cada una de las `programCount` instancias y deben declararse como `uniform` las constantes y variables de entrada que toma la función.
+El código implementado es muy similar al original salvo que es necesario hacer
+el `reduce` de todas las sumas parciales que se calculan en cada una de las
+`programCount` instancias y deben declararse como `uniform` las constantes y
+variables de entrada que toma la función.
+
+
 
 ## Intento de mejora implementación ISPC
 
-Una mejora que quisimos implementar fue reemplazar el if del segundo ciclo por un cif, ya que pensabamos que este camino se toma más veces y por lo tanto el programa daría un mejor rendimiento.
+Una mejora que quisimos implementar fue reemplazar el if del segundo ciclo por
+un cif, ya que pensabamos que este camino se toma más veces y por lo tanto el
+programa daría un mejor rendimiento.
 
-Al probarlo, utilizando `perf record` y `perf report` pudimos ver que la instrucción más cargada en el caso del if es `vfmadd231pd`, la cual constituye el 3.90% del total de ciclos de ejecución de la función forces.
+Al probarlo, utilizando `perf record` y `perf report` pudimos ver que la
+instrucción más cargada en el caso del if es `vfmadd231pd`, la cual constituye
+el 3.90% del total de ciclos de ejecución de la función forces.
 
 ![vfmadd231pd](pictures/perf-with-if.png)
 
-Y para el caso del cif, esta es `vmaskmovpd` la cual es producto del cálculo de máscaras que utiliza el con `coherent if`
+Y para el caso del cif, reemplazando la linea `if (rij2 <= rcut2)` por `cif
+(rij2 <= rcut2)` ahora la instruccion con mas ejecución es `vmaskmovpd` con un
+tiempo de ejecución casi idéntico de 3.91 % de ejecución.
 
 ![vmaskmovpd](pictures/perf-with-cif.png)
 
-Luego, al realizar 10 simulaciones para cada caso, obtuvimos la siguiente gráfica:
+Aunque las dos instrucciones tengan el mismo porcentaje de llamada los
+resultados muestran que el código resultante al implementar el `coherent if` es
+mucho más inestable.
+
+Al realizar 10 simulaciones para cada caso, obtuvimos la siguiente gráfica:
 
 ![cif_vs_if](pictures/cif_vs_if.png)
 
-Por lo tanto, concluimos que utilizar el cif no era conveniente para esta implementación, ya que en la mayoría de casos su desempeño fue peor al del if.
+Por lo tanto, concluimos que utilizar el cif no era conveniente para esta
+implementación, ya que en la mayoría de casos su desempeño fue peor al del if.
 
 
 ## Descubrimiento Intel DPC++ oneApi Clang
 
-Cuando estábamos realizando simulaciones para obtener las métricas finales de este informe, notamos que luego de setear las variables en `setvars.sh` para usar `icc` la llamada a clang se sobreescribía con el compilador `DPC++ Intel oneApi Clang`.
+Cuando estábamos realizando simulaciones para obtener las métricas finales de
+este informe, notamos que luego de setear las variables en `setvars.sh` para
+usar `icc` la llamada a clang se sobreescribía con el compilador `DPC++ Intel
+oneApi Clang`.
 
-Al probarlo vimos que este compilador autovectorizaba tanto las versiones AoS y SoA, sin utilizar `ISPC` y los resultados obtenidos eran iguales a los de la implementación con `forces.ispc`. Por lo tanto, usando este compilador no habría necesidad de re-implementar código.
+Al probarlo vimos que este compilador autovectorizaba tanto las versiones AoS y
+SoA, sin utilizar `ISPC` y los resultados obtenidos eran iguales a los de la
+implementación con `forces.ispc`. Por lo tanto, usando este compilador no habría
+necesidad de re-implementar código.
+
+
+## Plataforma de cálculos
+
+Los simulaciones se corrieron sobre Jupiterace, la cual tiene las siguientes
+prestaciones
+
+CPU:
+
+ * Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.4
+ * 14 cores, 28 threads,
+ * Proccesor frequency : 2.4 - 3.3 GHz
+ * Caches:
+    * L1 data: 896 KiB
+    * L1 instr.: 896 KiB
+    * L2: 7 MiB
+    * L3: 70 MiB
+
+Memoria:
+
+* Memoria RAM: 128 GB
 
 ## Compiladores
 
-Para poder obtener el mejor resultado de la nueva implementacion del programa, usamos las siguientes versiones de compiladores:
+Para poder obtener el mejor resultado de la nueva implementacion del programa,
+usamos las siguientes versiones de compiladores:
 
 * Intel(R) oneAPI DPC++ Compiler 2021.2.0 (Intel oneApi Clang)}
 * Debian clang version 11.0.1-2}
@@ -156,37 +241,106 @@ Para poder obtener el mejor resultado de la nueva implementacion del programa, u
 
 
 
-
 # Resultados
-En la siguiente figura se muestran los resultados para las diferentes versiónes de código y diferentes compiladores,
-* `orig` significa la versión original sin ninguna modificación
-* `SoA` es la versión con estructura de arreglos
+
+En la siguiente figura se muestran los resultados para las diferentes versiónes
+de código y diferentes compiladores con un tamaño de simulación N=500 para todos
+los casos.
+
+* `orig` significa la versión original sin ninguna modificación.
+* `SoA` es la versión con estructura de arreglos.
 * `ispc` es la versión con forces y minimum image implementadas en ISPC.
+
 ![compiladores](pictures/compiladores.png)
-Se observa el aumento del 50% para los compiladores clang, gcc y icc al utilizar la versión ISPC, en cambio para el compilador clang de intel los resultados son iguales para todas las versiones.
-
-|          | CFLAG                          | time  | GFLOPS | insn |
-|----------|--------------------------------|-------|--------|------|
-| Original | (intel)clang -O3 -march=native | 13.13 | 0.78   | 1.59 |
-|          | clang -O3 -march=native        | 23.45 | 0.44   | 1.02 |
-|          | gcc-5 -O3 -march=native        | 23.00 | 0.45   | 1.05 |
-|          | icc -O3 -xHost                 | 24.30 | 0.42   | 1.07 |
-| SoA      | (intel)clang -O3 -march=native | 13.83 | 0.74   | 1.71 |
-|          | clang -O3 -march=native        | 23.19 | 0.44   | 1.03 |
-|          | gcc-5 -O3 -march=native        | 23.12 | 0.44   | 1.04 |
-|          | icc -O3 -xHost                 | 23.36 | 0.44   | 1.02 |
-| ISPC     | (intel)clang -O3 -march=native | 12.86 | 0.80   | 1.28 |
-|          | clang -O3 -march=native        | 13.41 | 0.73   | 1.23 |
-|          | gcc-5 -O3 -march=native        | 12.88 | 0.80   | 1.28 |
-|          | icc -O3 -xHost                 | 12.8  | 0.79   | 1.28 |
 
 
-En la siguiente imagen se muestra la escalabilidad del problema, es decir el tiempo, los GFLOPS y el insn para diferentes tamaños de muestra N.
+## Metricas obtenidas
+
+### Original
+
+
+|  CFLAG                          |  Tiempo  |  GFLOPS | Insn  |
+| :-----------------------------  | -------  | :-----: | :---: |
+| (intel)clang -O3 -march=native  |  13.13   |  0.78   |  1.59 |
+| clang -O3 -march=native         |  23.45   |  0.44   |  1.02 |
+| gcc-5 -O3 -march=native         |  23.00   |  0.45   |  1.05 |
+| icc -O3 -xHost                  |  24.30   |  0.42   |  1.07 |
+
+
+### SoA
+
+
+|  CFLAG                          |  Tiempo  |  GFLOPS | Insn  |
+| :-----------------------------  | -------  | :-----: | :---: |
+| (intel)clang -O3 -march=native  |  13.83   |  0.74   |  1.71 |
+| clang -O3 -march=native         |  23.19   |  0.44   |  1.03 |
+| gcc-5 -O3 -march=native         |  23.12   |  0.44   |  1.04 |
+| icc -O3 -xHost                  |  23.36   |  0.44   |  1.02 |
+
+
+### ISPC
+
+
+|  CFLAG                          |  Time    |  GFLOPS | Insn  |
+| :-----------------------------  | -------  | :-----: | :---: |
+| (intel)clang -O3 -march=native  |  12.86   |  0.80   |  1.28 |
+| clang -O3 -march=native         |  13.41   |  0.73   |  1.23 |
+| gcc-5 -O3 -march=native         |  12.88   |  0.80   |  1.28 |
+| icc -O3 -xHost                  |  12.80   |  0.79   |  1.28 |
+
+
+
+Se observa el aumento del 56% para los compiladores clang, gcc y icc al utilizar
+la versión ISPC, en cambio para el compilador clang de intel los resultados son
+iguales para todas las versiones.
+
+En la siguiente imagen se muestra la escalabilidad del problema, es decir el
+tiempo, los GFLOPS y el insn para diferentes tamaños de muestra N.
+
 ![varNispc](pictures/varNispc.png)
+
+## Metricas
+
+|  CFLAG                                  |  Time     |  errtime |   GFLOPS   | Insn  |
+| :-------------------------------------  | :-------: | :-----:  | :--------: | :---: |
+| (intel)clang -O3 -march=native -DN=250  |  4.0557   |  0.08    |  0.67      |  1.28 |
+| (intel)clang -O3 -march=native -DN=512  |  14.051   |  0.90    |  0.78      |  1.30 |
+| (intel)clang -O3 -march=native -DN=1372 |  81.19    |  6.51    |  1.03      |  1.45 |
+| (intel)clang -O3 -march=native -DN=2048 |  159.45   |  5.52    |  1.12      |  1.51 |
+| (intel)clang -O3 -march=native -DN=4000 |  532.1610 |  0.02    |  1.23      |  1.62 |
+
+
+## Comparativa contra la mejor versión del laboratorio 1
+
+Laboratorio 1:
+
+* Usando GCC
+* 0.45 GFlops
+* Sobre codigo original
+* Tamaño de simulacion N=500
+
+Laboratorio 2:
+
+* Usando DPC++ Clang Intel OneApi
+* 0.80 GFLops
+* Sobre version con forces implementada en ISPC
+* Tamaño de simulacion N=500
+
+
+Esto en total representa una mejora aproximada de un x1.56 o un 56 % más de Gflops.
+
+
+![Lab1_vs_lab2](pictures/lab1_vs_lab2.png)
 
 
 # Conclusiones
 
-*  El código en ISPC tiene una performance aproximadamente 70% mejor.
+*  El código en ISPC tiene una performance aproximadamente 56% mejor.
 *  Utilizar cif en forces.ispc no mejoró el rendimiento.
-*  El compilador Clang DPC++ de Intel vectoriza todo el código automáticamente, tanto las versiones AoS como SoA.
+*  El compilador Clang DPC++ de Intel vectoriza todo el código automáticamente,
+   tanto las versiones AoS como SoA.
+
+
+## Repositorio
+
+* https://github.com/JukMR/tiny_md/

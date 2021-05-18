@@ -17,6 +17,7 @@ double minimum_image(double cordi, const double cell_length)
     } else if (cordi > 0.5* cell_length) {
         cordi -= cell_length;
     }
+//    cordi -= nearbyint(cordi*(1/cell_length))*cell_length; 
     return cordi;
 }
 
@@ -40,23 +41,26 @@ foreach(i = 0 ... N-1)
     fy[i] = 0.0d;
     fz[i] = 0.0d;
 }
-uniform double pres_vir;
-double pres_vir_partial = 0.0d ;
+uniform double pres_vir=0.0;
+*epot=0.0;
 uniform double rcut2 = RCUT * RCUT;
-double epot_partial = 0.0d;
 uniform const double RCUT12 = RCUT*RCUT*RCUT*RCUT*RCUT*RCUT*RCUT*RCUT*RCUT*RCUT*RCUT*RCUT;
 uniform const double RCUT6  = RCUT*RCUT*RCUT*RCUT*RCUT*RCUT;
 uniform const double ECUT = 4.0 * ( 1/(RCUT12) - 1/(RCUT6)  );
 //#define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
 uniform double L2 = 0.5*L;
-foreach(i = 0 ... N-1)
+for(uniform int i = 0 ; i < (N-1) ; i+=1)
 {
+    double fxi = 0.0;
+    double fyi = 0.0;
+    double fzi = 0.0;
+    double epot_partial = 0.0d;
+    double pres_vir_partial = 0.0d ;
+    foreach (j = i+1 ... (N-1)){    
     double xi = rx[i];
     double yi = ry[i];
     double zi = rz[i];
 
-    for (int j = i + 1; j <  N-1; j++)
-    {
         double xj = rx[j];
         double yj = ry[j];
         double zj = rz[j];
@@ -77,9 +81,9 @@ foreach(i = 0 ... N-1)
 
             double fr = 24.0d * r2inv * r6inv * (2.0d * r6inv - 1.0d);
 
-            fx[i] += fr * rxd;
-            fy[i] += fr * ryd;
-            fz[i] += fr * rzd;
+            fxi += fr * rxd;
+            fyi += fr * ryd;
+            fzi += fr * rzd;
             fx[j] -= fr * rxd;
             fy[j] -= fr * ryd;
             fz[j] -= fr * rzd;
@@ -87,93 +91,17 @@ foreach(i = 0 ... N-1)
 
             epot_partial +=  4.0d * r6inv * (r6inv - 1.0) - ECUT; 
             pres_vir_partial += fr * rij2 ;
-
         }
-
     }
+fx[i]+= reduce_add(fxi);
+fy[i]+= reduce_add(fyi);
+fz[i]+= reduce_add(fzi);
+*epot+=reduce_add(epot_partial);
+pres_vir+=reduce_add(pres_vir_partial);
 }
-*epot=reduce_add(epot_partial);
-pres_vir=reduce_add(pres_vir_partial);
 pres_vir /= (V * 3.0d);
 *pres = *temp * rho + pres_vir; // revisar
 }
 
 
 
-
-/*
-export void forces(const double uniform rx[],
-                   const double uniform ry[],
-                   const double uniform rz[],
-                   double uniform fx[],
-                   double uniform fy[],
-                   double uniform fz[],
-                   double epot[],
-                   double pres[],
-                   uniform const double uniform temp[],
-                   uniform const double rho,
-                   uniform const double V,
-                   uniform const double L)
-{
-
-foreach(i = 0 ... N-1)
-{
-    fx[i] = 0.0;
-    fy[i] = 0.0;
-    fz[i] = 0.0;
-}
-
-double pres_vir = 0.0;
-double rcut2 = RCUT * RCUT;
-double epot[0] = {0.0};
-
-
-
-foreach(i = 0 ... (N-1))
-{
-    double xi = rx[i];
-    double yi = ry[i];
-    double zi = rz[i];
-
-    for (int j = i + 1; j <  N; j++)
-    {
-        double xj = rx[j];
-        double yj = ry[j];
-        double zj = rz[j];
-
-
-        double rx = xi - xj;
-        rx = minimum_image(rx, L);
-        double ry = yi - yj;
-        ry = minimum_image(ry, L);
-        double rz = zi - zj;
-        rz = minimum_image(rz, L);
-
-        double rij2 = rx * rx + ry * ry + rz * rz;
-
-        if (rij2 <= rcut2) {
-            double r2inv = 1.0 / rij2;
-            double r6inv = r2inv * r2inv * r2inv;
-
-            double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0);
-
-            fx[i] += fr * rx;
-            fy[i] += fr * ry;
-            fz[i] += fr * rz;
-
-            fx[j] -= fr * rx;
-            fy[j] -= fr * ry;
-            fz[j] -= fr * rz;
-
-            epot[0] =  4.0 * r6inv * (r6inv - 1.0) - ECUT; // revisar
-
-        }
-
-    }
-}
-
-pres_vir = pres_vir / (V * 3.0);
-pres[0] = *temp * rho + pres_vir; // revisar
-}
-
-*/

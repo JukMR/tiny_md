@@ -1,13 +1,22 @@
-CC      =  icc
-CFLAGS  = -O3 -xHost $(particles) #-fp-model fast=2 -no-prec-div -funro>
-#CFLAGS  = -O3 -march=native -DN=500  # -Rpass=loop-vectorize
-WFLAGS  = -std=c11 -Wall -Wextra -g
-LDFLAGS = -lm
-TARGETS = tiny_md viz
-SOURCES = $(shell echo *.c)
-OBJECTS = core.o wtime.o
+CC      =  clang
+CFLAGS  = -O3 -march=native $(particles)
+WFLAGS	= -std=c11 -Wall -Wextra -g
+LDFLAGS	= -lm
+TARGETS	= tiny_md viz
+SOURCES	= $(shell echo *.c)
+OBJECTS = core.o wtime.o forces.o
+
+all: pre-build $(TARGETS)
+
+pre-build:
+	$(ispc) $(ispc_flags) forces.ispc -o forces.o -h forces.h
+
+
+ispc = /opt/ispc/1.15.0/bin/ispc
+ispc_flags = -g -O3 --target=avx2-i64x4 --cpu=core-avx2 $(particles) --pic
+
 particles = -DN=500
-all: $(TARGETS)
+
 viz: viz.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -lGL -lGLU -lglut
 tiny_md: tiny_md.o $(OBJECTS)

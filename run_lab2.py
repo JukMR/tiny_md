@@ -1,3 +1,6 @@
+# Esta funcion toma 2 parametros, primero el numero de veces a correr para
+# conseguir la muestra y segundo las banderas para pasarle a make
+
 import subprocess
 import sys
 from statistics import stdev, mean
@@ -16,9 +19,9 @@ def run_debug(number, bash_cmd_list):
             sys.exit("An error has ocurred")
 
 
-def run(makecmd, runcmd):
+def run(makecmd, runcmd, niterations=10):
     run_debug(1, makecmd)
-    run_debug(10, runcmd)
+    run_debug(niterations, runcmd)
 
 
 def Average(lst):
@@ -42,17 +45,22 @@ def avg_maker(path):
                     tmp.append(a)
             newtest_list.append(tmp)
 
-
+        # Calcular los promedios y las desviaciones
         average_list, sigma_list = [] , []
 
         for i in newtest_list:
-            j = Average(i)
-            s = stdev(i)
-            average_list.append(j)
-            sigma_list.append(s)
+            if len(i) > 1: # Sample has many tests
+                j = Average(i)
+                s = stdev(i)
+                average_list.append(j)
+                sigma_list.append(s)
+            elif len(i) == 1: # Sample has only one test
+                average_list.append(i[0])
+                sigma_list.append(-1)
 
 
         average_dict, sigma_dict = [], []
+
         for i in average_list:
             average_dict.append((round(i, 6)))
         app_arr.append(average_dict)
@@ -98,14 +106,29 @@ except IOError:
 
 
 # Ejecutar el programa
-makecmd = ["make clean && make"]
+
+if len(sys.argv) > 2:
+    flags = sys.argv[2]
+makecmd = [f"make clean && make {flags}"]
 runcmd = ["./tiny_md"]
-run(makecmd, runcmd)
+
+# Pasar el numero de corridas a hacer como argumento
+if len(sys.argv) > 1:
+    try:
+        n = int(sys.argv[1])
+    except ValueError:
+        print("Por favor ingresar un numero para el argumento")
+        sys.exit()
+
+
+run(makecmd, runcmd, niterations=n)
 
 # Imprimir y plotear los resultados
 result = []
 result = avg_maker('statics.res')
-print(result)
+print(f"Los promedios son: \n{result[0]}\n")
+print(f"Las desviaciones son: \n{result[1]}\n")
+
 
 # Guardar los resultados en un archivo
 try:

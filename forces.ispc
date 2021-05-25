@@ -17,7 +17,7 @@ double minimum_image(double cordi, const double cell_length)
     } else if (cordi > 0.5* cell_length) {
         cordi -= cell_length;
     }
-//    cordi -= nearbyint(cordi*(1/cell_length))*cell_length; 
+//    cordi -= nearbyint(cordi*(1/cell_length))*cell_length;
     return cordi;
 }
 
@@ -56,7 +56,7 @@ for(uniform int i = 0 ; i < (N-1) ; i+=1)
     double fzi = 0.0;
     double epot_partial = 0.0d;
     double pres_vir_partial = 0.0d ;
-    foreach (j = i+1 ... (N-1)){    
+    foreach (j = i+1 ... (N-1)){
     double xi = rx[i];
     double yi = ry[i];
     double zi = rz[i];
@@ -89,7 +89,7 @@ for(uniform int i = 0 ; i < (N-1) ; i+=1)
             fz[j] -= fr * rzd;
 
 
-            epot_partial +=  4.0d * r6inv * (r6inv - 1.0) - ECUT; 
+            epot_partial +=  4.0d * r6inv * (r6inv - 1.0) - ECUT;
             pres_vir_partial += fr * rij2 ;
         }
     }

@@ -10,7 +10,7 @@ ispc = /opt/ispc/1.15.0/bin/ispc
 ispc_flags = -g -O3 --target=avx2-i64x4 --cpu=core-avx2 $(particles) --pic
 
 particles = -DN=$(N)
-N = 500
+N = 1372
 
 all: pre-build $(TARGETS)
 

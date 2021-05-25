@@ -141,4 +141,5 @@ except IOError:
     print("Cannot open file")
     sys.exit(1)
 
-plot(result[0])
+if "-no-plot" not in sys.argv:
+    plot(result[0])

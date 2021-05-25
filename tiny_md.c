@@ -1,4 +1,4 @@
-#define _XOPEN_SOURCE 500  // M_PI
+#define _XOPEN_SOURCE 500 // M_PI
 #include "core.h"
 #include "parameters.h"
 #include "wtime.h"
@@ -15,20 +15,20 @@ int main()
     file_thermo = fopen("thermo.log", "w");
     double Ekin, Epot, Temp, Pres; // variables macroscopicas
     double Rho, cell_V, cell_L, tail, Etail, Ptail;
-    double *rx,*ry,*rz, *vx,*vy,*vz, *fx,*fy,*fz; // variables microscopicas
-    rx = (double*)malloc( N * sizeof(double));
-    ry = (double*)malloc( N * sizeof(double));
-    rz = (double*)malloc( N * sizeof(double));
-    vx = (double*)malloc( N * sizeof(double));
-    vy = (double*)malloc( N * sizeof(double));
-    vz = (double*)malloc( N * sizeof(double));
-    fx = (double*)malloc( N * sizeof(double));
-    fy = (double*)malloc( N * sizeof(double));
-    fz = (double*)malloc( N * sizeof(double));
+    double *rx, *ry, *rz, *vx, *vy, *vz, *fx, *fy, *fz; // variables microscopicas
+    rx = (double*)malloc(N * sizeof(double));
+    ry = (double*)malloc(N * sizeof(double));
+    rz = (double*)malloc(N * sizeof(double));
+    vx = (double*)malloc(N * sizeof(double));
+    vy = (double*)malloc(N * sizeof(double));
+    vz = (double*)malloc(N * sizeof(double));
+    fx = (double*)malloc(N * sizeof(double));
+    fy = (double*)malloc(N * sizeof(double));
+    fz = (double*)malloc(N * sizeof(double));
 
-//    rxyz = (double*)malloc(3 * N * sizeof(double));
-//    vxyz = (double*)malloc(3 * N * sizeof(double));
-//    fxyz = (double*)malloc(3 * N * sizeof(double));
+    //    rxyz = (double*)malloc(3 * N * sizeof(double));
+    //    vxyz = (double*)malloc(3 * N * sizeof(double));
+    //    fxyz = (double*)malloc(3 * N * sizeof(double));
 
     printf("# Número de partículas:      %d\n", N);
     printf("# Temperatura de referencia: %.2f\n", T0);
@@ -42,7 +42,7 @@ int main()
     double t = 0.0, sf;
     double Rhob;
     Rho = RHOI;
-    init_pos(rx,ry,rz, Rho);
+    init_pos(rx, ry, rz, Rho);
     double start = wtime();
 
     // double ecut = (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)));
@@ -57,22 +57,32 @@ int main()
 
         int i = 0;
         sf = cbrt(Rhob / Rho);
-        for (int k = 0; k < N; k++) { // reescaleo posiciones a nueva densidad
-            rx[k] *= sf;
-            ry[k] *= sf;
-            rz[k] *= sf;
+
+        #pragma omp parallel
+        {
+            #pragma omp for
+            for (int k = 0; k < N; k++) { // reescaleo posiciones a nueva densidad
+                #pragma omp critical
+                rx[k] *= sf;
+                ry[k] *= sf;
+                rz[k] *= sf;
+            }
+
+            #pragma omp master
+            {
+            init_vel(vx, vy, vz, &Temp, &Ekin);
+            forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho,
+                   cell_V, cell_L);
+            }
         }
-
-        init_vel(vx,vy,vz, &Temp, &Ekin);
-        forces(rx,ry,rz, fx,fy,fz, &Epot, &Pres, &Temp, Rho,
-               cell_V, cell_L);
-
+        // #pragma omp parallel for // this breaks everything
         for (i = 1; i < TEQ; i++) { // loop de equilibracion
 
-            velocity_verlet(rx,ry,rz, vx,vy,vz, fx,fy,fz, &Epot, &Ekin, &Pres, &Temp, Rho, cell_V, cell_L);
+            velocity_verlet(rx, ry, rz, vx, vy, vz, fx, fy, fz, &Epot, &Ekin, &Pres, &Temp, Rho, cell_V, cell_L);
 
             sf = sqrt(T0 / Temp);
-            for (int k = 0; k <  N; k++) { // reescaleo de velocidades
+            for (int k = 0; k < N; k++) { // reescaleo de velocidades
+                #pragma omp critical
                 vx[k] *= sf;
                 vy[k] *= sf;
                 vz[k] *= sf;
@@ -83,13 +93,13 @@ int main()
         double epotm = 0.0, presm = 0.0;
         for (i = TEQ; i < TRUN; i++) { // loop de medicion
 
-            velocity_verlet(rx,ry,rz, vx,vy,vz, fx,fy,fz, &Epot, &Ekin, &Pres, &Temp, Rho, cell_V, cell_L);
+            velocity_verlet(rx, ry, rz, vx, vy, vz, fx, fy, fz, &Epot, &Ekin, &Pres, &Temp, Rho, cell_V, cell_L);
 
             sf = sqrt(T0 / Temp);
             for (int k = 0; k < N; k++) { // reescaleo de velocidades
                 vx[k] *= sf;
-		vy[k] *= sf;
-		vz[k] *= sf;
+                vy[k] *= sf;
+                vz[k] *= sf;
             }
 
             if (i % TMES == 0) {
@@ -102,7 +112,7 @@ int main()
 
                 fprintf(file_thermo, "%f %f %f %f %f\n", t, Temp, Pres, Epot, Epot + Ekin);
                 fprintf(file_xyz, "%d\n\n", N);
-                for (int k = 0; k <  N; k++) {
+                for (int k = 0; k < N; k++) {
                     fprintf(file_xyz, "Ar %e %e %e\n", rx[k], ry[k], rz[k]);
                 }
             }
@@ -113,17 +123,17 @@ int main()
     }
 
     double elapsed = wtime() - start;
-    FILE *logs;
+    FILE* logs;
     logs = fopen("statics.res", "a");
     if (logs == NULL) {
-      printf("Cannot open statics log file");
-      exit(EXIT_FAILURE);
+        printf("Cannot open statics log file");
+        exit(EXIT_FAILURE);
     }
 
     fprintf(logs, "# Tiempo total de simulación = %f segundos\n", elapsed);
-    double foperations = (N * (N - 1) * 0.5 * 41.0 + 5.0 ) * TRUN;
-    fprintf(logs, "%s %f \n", "Floating point operation done:" , foperations);
-    double flops = foperations/elapsed;
+    double foperations = (N * (N - 1) * 0.5 * 41.0 + 5.0) * TRUN;
+    fprintf(logs, "%s %f \n", "Floating point operation done:", foperations);
+    double flops = foperations / elapsed;
     fprintf(logs, "%s %f\n", "FLOPS:", flops);
     fprintf(logs, "%s %f\n", "GFLOPS:", flops / (1000.0 * 1000.0 * 1000.0));
     fprintf(logs, "# Tiempo simulado = %f [fs]\n", t * 1.6);

@@ -5,6 +5,8 @@
 #include <stdlib.h> // rand()
 
 #include "forces.h"
+#include <omp.h>
+
 void init_pos(double* rx, double* ry, double* rz, const double rho)
 {
     // inicialización de las posiciones de los átomos en un cristal FCC
@@ -107,15 +109,12 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
     forces(rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L); // actualizo fuerzas
 
     double sumv2 = 0.0;
-    #pragma omp parallel for reduction(+:sumv2)
-    {
     for (int i = 0; i < N; i++) { // actualizo velocidades
         vx[i] += 0.5 * fx[i] * DT;
         vy[i] += 0.5 * fy[i] * DT;
         vz[i] += 0.5 * fz[i] * DT;
 
         sumv2 += vx[i] * vx[i] + vy[i] * vy[i] + vz[i] * vz[i];
-    }
     }
     *ekin = 0.5 * sumv2;
     *temp = sumv2 / (3.0 * N);

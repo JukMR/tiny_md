@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <omp.h>
 
 int main()
 {
@@ -58,31 +59,21 @@ int main()
         int i = 0;
         sf = cbrt(Rhob / Rho);
 
-        #pragma omp parallel
-        {
-            #pragma omp for
             for (int k = 0; k < N; k++) { // reescaleo posiciones a nueva densidad
-                #pragma omp critical
                 rx[k] *= sf;
                 ry[k] *= sf;
                 rz[k] *= sf;
             }
 
-            #pragma omp master
-            {
             init_vel(vx, vy, vz, &Temp, &Ekin);
             forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho,
                    cell_V, cell_L);
-            }
-        }
-        // #pragma omp parallel for // this breaks everything
         for (i = 1; i < TEQ; i++) { // loop de equilibracion
 
             velocity_verlet(rx, ry, rz, vx, vy, vz, fx, fy, fz, &Epot, &Ekin, &Pres, &Temp, Rho, cell_V, cell_L);
 
             sf = sqrt(T0 / Temp);
             for (int k = 0; k < N; k++) { // reescaleo de velocidades
-                #pragma omp critical
                 vx[k] *= sf;
                 vy[k] *= sf;
                 vz[k] *= sf;

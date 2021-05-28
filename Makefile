@@ -1,7 +1,7 @@
-CC      =  clang
+CC      = clang
 CFLAGS  = -fopenmp -O3 -march=native $(particles)
 WFLAGS	= -std=c11 -Wall -Wextra -g
-LDFLAGS	= -lm
+LDFLAGS	= -lm -lgomp
 TARGETS	= tiny_md viz
 SOURCES	= $(shell echo *.c)
 OBJECTS = core.o wtime.o forces.o
@@ -19,13 +19,18 @@ pre-build:
 
 viz: viz.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -lGL -lGLU -lglut
+
 tiny_md: tiny_md.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
 %.o: %.c
 	$(CC) $(WFLAGS) $(CPPFLAGS) $(CFLAGS) -c $<
+
 clean:
 	rm -f $(TARGETS) *.o *.xyz *.log .depend
+
 .depend: $(SOURCES)
 	$(CC) -MM $^ > $@
+
 -include .depend
 .PHONY: clean all

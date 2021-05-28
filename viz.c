@@ -140,7 +140,12 @@ static void idle_func(void)
 
         init_pos(rx, ry, rz, Rho);
         init_vel(vx, vy, vz, &Temp, &Ekin);
-        forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size);
+
+        for (int row = 0; row < N-1; row++)
+        {
+            forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size, row);
+        }
+
 
         switcher = 0;
 
@@ -165,7 +170,11 @@ static void idle_func(void)
             rz[k] *= sf;
         }
         init_vel(vx, vy, vz, &Temp, &Ekin);
-        forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size);
+
+        for (int row = 0; row < N-1; row++)
+        {
+            forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size, row);
+        }
 
         switcher = 0;
         if (fabs(Rho - (RHOI - 0.9f)) < 1e-6) {
@@ -291,9 +300,13 @@ int main(int argc, char** argv)
 
     init_pos(rx, ry, rz, Rho);
     init_vel(vx, vy, vz, &Temp, &Ekin);
-    forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size);
-    //
-    //
+
+    for (int row = 0; row < N-1; row++)
+    {
+        forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size, row);
+    }
+
+
 
     printf("# Número de partículas:      %d\n", N);
     printf("# Temperatura de referencia: %.2f\n", T0);

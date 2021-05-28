@@ -46,12 +46,10 @@ void init_vel(double* vx, double* vy, double* vz, double* temp, double* ekin)
     // inicialización de velocidades aleatorias
 
     double sf, sumvx = 0.0, sumvy = 0.0, sumvz = 0.0, sumv2 = 0.0;
-
     for (int i = 0; i < N; i++) {
         vx[i] = rand() / (double)RAND_MAX - 0.5;
         vy[i] = rand() / (double)RAND_MAX - 0.5;
         vz[i] = rand() / (double)RAND_MAX - 0.5;
-
         sumvx += vx[i];
         sumvy += vy[i];
         sumvz += vz[i];
@@ -106,8 +104,10 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
         vz[i] += 0.5 * fz[i] * DT;
     }
 
-    forces(rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L); // actualizo fuerzas
+    for (int row = 0; row < N-1; row++){
 
+        forces(rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L, row); // actualizo fuerzas
+    }
     double sumv2 = 0.0;
     for (int i = 0; i < N; i++) { // actualizo velocidades
         vx[i] += 0.5 * fx[i] * DT;

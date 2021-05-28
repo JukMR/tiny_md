@@ -34,14 +34,15 @@ export void forces(const double uniform rx[],
                    uniform const double rho,
                    uniform const double V,
                    uniform const double L,
-                   uniform const int row)
+                   uniform const int32 row)
 {
-        fx[row] = 0.0d;
-        fy[row] = 0.0d;
-        fz[row] = 0.0d;
+
+//        fx[row] = 0.0d;
+//        fy[row] = 0.0d;
+//        fz[row] = 0.0d;
 
     uniform double pres_vir = 0.0;
-    *epot = 0.0;
+//    *epot = 0.0;
     uniform double rcut2 = RCUT * RCUT;
     uniform const double RCUT12 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT *
                                 RCUT * RCUT * RCUT * RCUT * RCUT;
@@ -50,15 +51,17 @@ export void forces(const double uniform rx[],
     uniform const double ECUT = 4.0 * (1/(RCUT12) - 1/(RCUT6));
     //#define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
     uniform double L2 = 0.5 * L;
+///////////////////////////////////////////////
+// for (uniform int i = 0; i < (N - 1); i++) {
 
-        double fxi = 0.0;
-        double fyi = 0.0;
-        double fzi = 0.0;
+    double fxi = 0.0;
+    double fyi = 0.0;
+    double fzi = 0.0;
+    double epot_partial = 0.0d;
+    double pres_vir_partial = 0.0d ;
 
-        double epot_partial = 0.0d;
-        double pres_vir_partial = 0.0d ;
+	foreach (j = row+1 ... (N-1)){
 
-        foreach (j = row+1 ... (N-1)){
             double xi = rx[row];
             double yi = ry[row];
             double zi = rz[row];
@@ -100,9 +103,12 @@ export void forces(const double uniform rx[],
         fz[row] += reduce_add(fzi);
         *epot +=reduce_add(epot_partial);
         pres_vir += reduce_add(pres_vir_partial);
+  //}
+   pres_vir /= (V * 3.0d);
+   //*pres = *temp * rho + pres_vir; // revisar
+   *pres += pres_vir; // revisar
 
-    pres_vir /= (V * 3.0d);
-    *pres = *temp * rho + pres_vir; // revisar
+
 }
 
 

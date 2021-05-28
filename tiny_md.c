@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <omp.h>
+//#include <omp.h>
 int main()
 {
     FILE *file_xyz, *file_thermo;
@@ -66,10 +66,22 @@ int main()
 
             init_vel(vx, vy, vz, &Temp, &Ekin);
 
-            for(int row = 0 ; row < N-1 ; row++) {
-                forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho,
-                       cell_V, cell_L, row);
+	    for (int j = 0; j <  N; j++) {
+              fx[j] = 0.0;
+              fy[j] = 0.0;
+              fz[j] = 0.0;
             }
+            Epot=0;
+            Pres=Temp* Rho ;
+            for (int i = 0; i < N-1; i+=1){
+               forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, cell_V, cell_L, i); // actualizo fuerzas
+            }
+
+
+         //   for(int row = 0 ; row < N-1 ; row++) {
+         //       forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho,
+         //              cell_V, cell_L, row );
+         //   }
         for (i = 1; i < TEQ; i++) { // loop de equilibracion
 
             velocity_verlet(rx, ry, rz, vx, vy, vz, fx, fy, fz, &Epot, &Ekin, &Pres, &Temp, Rho, cell_V, cell_L);

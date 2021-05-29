@@ -60,8 +60,10 @@ export void forces(const double uniform rx[],
     double epot_partial = 0.0d;
     double pres_vir_partial = 0.0d ;
 
-	foreach (j = row+1 ... (N-1)){
-
+//	foreach (j = row+1 ... (N-1)){
+	foreach (j = 0 ... (N-1)){
+	if(j!=row){ 
+	//{
             double xi = rx[row];
             double yi = ry[row];
             double zi = rz[row];
@@ -85,24 +87,26 @@ export void forces(const double uniform rx[],
                 double r6inv = r2inv*r2inv*r2inv;
 
                 double fr = 24.0d * r2inv * r6inv * (2.0d * r6inv - 1.0d);
-
+//		#pragma omp critical
                 fxi += fr * rxd;
                 fyi += fr * ryd;
                 fzi += fr * rzd;
-                fx[j] -= fr * rxd;
-                fy[j] -= fr * ryd;
-                fz[j] -= fr * rzd;
+//                fx[j] -= fr * rxd;
+//                fy[j] -= fr * ryd;
+//                fz[j] -= fr * rzd;
 
 
                 epot_partial +=  4.0d * r6inv * (r6inv - 1.0) - ECUT;
                 pres_vir_partial += fr * rij2 ;
             }
         }
+        } //endif 
+//	#pragma omp critical
         fx[row] += reduce_add(fxi);
         fy[row] += reduce_add(fyi);
         fz[row] += reduce_add(fzi);
-        *epot +=reduce_add(epot_partial);
-        pres_vir += reduce_add(pres_vir_partial);
+        *epot +=reduce_add(epot_partial)/2;
+        pres_vir += reduce_add(pres_vir_partial)/2;
   //}
    pres_vir /= (V * 3.0d);
    //*pres = *temp * rho + pres_vir; // revisar

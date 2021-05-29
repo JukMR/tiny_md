@@ -1,5 +1,5 @@
-CC      = clang
-CFLAGS  = -fopenmp -O3 -march=native $(particles)
+CC      = gcc
+CFLAGS  = -fopenmp -ffast-math -O3 -march=native $(particles)
 WFLAGS	= -std=c11 -Wall -Wextra -g
 LDFLAGS	= -lm -lgomp
 TARGETS	= tiny_md viz

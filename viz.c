@@ -141,6 +141,15 @@ static void idle_func(void)
         init_pos(rx, ry, rz, Rho);
         init_vel(vx, vy, vz, &Temp, &Ekin);
 
+	    for (int j = 0; j <  N; j++) {
+              fx[j] = 0.0;
+              fy[j] = 0.0;
+              fz[j] = 0.0;
+            }
+            Epot=0;
+            Pres=Temp* Rho ;
+
+        //#pragma omp parallel for
         for (int row = 0; row < N-1; row++)
         {
             forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size, row);
@@ -171,6 +180,15 @@ static void idle_func(void)
         }
         init_vel(vx, vy, vz, &Temp, &Ekin);
 
+	    for (int j = 0; j <  N; j++) {
+              fx[j] = 0.0;
+              fy[j] = 0.0;
+              fz[j] = 0.0;
+            }
+            Epot=0;
+            Pres=Temp* Rho ;
+
+        //#pragma omp parallel for
         for (int row = 0; row < N-1; row++)
         {
             forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size, row);
@@ -300,7 +318,14 @@ int main(int argc, char** argv)
 
     init_pos(rx, ry, rz, Rho);
     init_vel(vx, vy, vz, &Temp, &Ekin);
-
+    for (int j = 0; j <  N; j++) {
+            fx[j] = 0.0;
+            fy[j] = 0.0;
+            fz[j] = 0.0;
+        }
+        Epot=0;
+        Pres=Temp* Rho ;
+    //#pragma omp parallel for
     for (int row = 0; row < N-1; row++)
     {
         forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size, row);

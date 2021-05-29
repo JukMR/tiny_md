@@ -73,6 +73,8 @@ int main()
             }
             Epot=0;
             Pres=Temp* Rho ;
+
+            // #pragma omp parallel for
             for (int i = 0; i < N-1; i+=1){
                forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, cell_V, cell_L, i); // actualizo fuerzas
             }

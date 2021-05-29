@@ -5,7 +5,7 @@
 #include <stdlib.h> // rand()
 
 #include "forces.h"
-//#include <omp.h>
+#include <omp.h>
 
 void init_pos(double* rx, double* ry, double* rz, const double rho)
 {
@@ -112,9 +112,12 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
     }
     *epot=0;
     *pres=*temp* rho ;
-    for (int i = 0; i < N-1; i+=1){
+
+    // #pragma omp parallel for schedule(guided)
+    for (int i = 0; i < N-1; i++){
         forces(rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L, i); // actualizo fuerzas
     }
+
     double sumv2 = 0.0;
     for (int i = 0; i < N; i++) { // actualizo velocidades
         vx[i] += 0.5 * fx[i] * DT;

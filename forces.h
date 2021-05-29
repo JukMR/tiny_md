@@ -32,7 +32,7 @@ namespace ispc { /* namespace */
 #if defined(__cplusplus) && (! defined(__ISPC_NO_EXTERN_C) || !__ISPC_NO_EXTERN_C )
 extern "C" {
 #endif // __cplusplus
-    extern void forces(const double * rx, const double * ry, const double * rz, double * fx, double * fy, double * fz, double * epot, double * pres, const double * temp, const double rho, const double V, const double L, const int32_t row);
+    extern void forces(const double * rx, const double * ry, const double * rz, double * fx, double * fy, double * fz, double * epot, double * pres, const double * temp, const double rho, const double V, const double L, const int32_t i);
 #if defined(__cplusplus) && (! defined(__ISPC_NO_EXTERN_C) || !__ISPC_NO_EXTERN_C )
 } /* end extern C */
 #endif // __cplusplus

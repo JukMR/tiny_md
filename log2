@@ -1,0 +1,221 @@
+➜  tiny_md git:(openmp) ✗ for i in {1..6}; do echo "usando" $i "cores"&& OMP_NUM_THREADS=$i perf stat ./tiny_md ; done
+usando 1 cores
+# Número de partículas:      500
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	416.666667	-2745.315210	28.629533
+1.100000	454.545455	-2947.219206	17.754442
+1.000000	500.000000	-2509.506894	15.197686
+0.900000	555.555556	-2515.342275	9.012235
+0.800000	625.000000	-2368.667848	5.276628
+0.700000	714.285714	-2148.871171	3.004536
+0.600000	833.333333	-1873.044364	1.783435
+0.500000	1000.000000	-1570.155170	1.058279
+0.400000	1250.000000	-1263.906097	0.710415
+
+ Performance counter stats for './tiny_md':
+
+          9.115,09 msec task-clock                #    0,993 CPUs utilized          
+             1.021      context-switches          #    0,112 K/sec                  
+                10      cpu-migrations            #    0,001 K/sec                  
+               159      page-faults               #    0,017 K/sec                  
+    35.985.286.290      cycles                    #    3,948 GHz                    
+       500.538.923      stalled-cycles-frontend   #    1,39% frontend cycles idle   
+    14.348.666.182      stalled-cycles-backend    #   39,87% backend cycles idle    
+    47.978.026.355      instructions              #    1,33  insn per cycle         
+                                                  #    0,30  stalled cycles per insn
+     5.530.067.923      branches                  #  606,694 M/sec                  
+       409.580.077      branch-misses             #    7,41% of all branches        
+
+       9,175773723 seconds time elapsed
+
+       9,098101000 seconds user
+       0,015996000 seconds sys
+
+
+usando 2 cores
+# Número de partículas:      500
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	416.666667	-2717.423435	28.244101
+1.100000	454.545455	-2912.556881	17.567945
+1.000000	500.000000	-2485.094144	14.958540
+0.900000	555.555556	-2481.052035	9.020504
+0.800000	625.000000	-2351.553540	5.206771
+0.700000	714.285714	-2126.630989	2.958770
+0.600000	833.333333	-1847.202085	1.780105
+0.500000	1000.000000	-1554.573392	1.057442
+0.400000	1250.000000	-1236.004599	0.702195
+
+ Performance counter stats for './tiny_md':
+
+         15.356,26 msec task-clock                #    1,996 CPUs utilized          
+             1.815      context-switches          #    0,118 K/sec                  
+                11      cpu-migrations            #    0,001 K/sec                  
+               170      page-faults               #    0,011 K/sec                  
+    60.096.112.847      cycles                    #    3,913 GHz                    
+       464.752.002      stalled-cycles-frontend   #    0,77% frontend cycles idle   
+    37.182.107.917      stalled-cycles-backend    #   61,87% backend cycles idle    
+    59.861.877.151      instructions              #    1,00  insn per cycle         
+                                                  #    0,62  stalled cycles per insn
+     9.427.212.336      branches                  #  613,900 M/sec                  
+       365.029.649      branch-misses             #    3,87% of all branches        
+
+       7,692147509 seconds time elapsed
+
+      15,281829000 seconds user
+       0,071952000 seconds sys
+
+
+usando 3 cores
+# Número de partículas:      500
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	416.666667	-2668.461254	27.609502
+1.100000	454.545455	-2849.261811	17.197570
+1.000000	500.000000	-2453.534199	14.588806
+0.900000	555.555556	-2446.457454	8.888509
+0.800000	625.000000	-2306.617379	5.189986
+0.700000	714.285714	-2088.009165	2.948331
+0.600000	833.333333	-1804.505137	1.758593
+0.500000	1000.000000	-1527.789011	1.040847
+0.400000	1250.000000	-1226.094390	0.711693
+
+ Performance counter stats for './tiny_md':
+
+         17.731,86 msec task-clock                #    2,951 CPUs utilized          
+             6.632      context-switches          #    0,374 K/sec                  
+                24      cpu-migrations            #    0,001 K/sec                  
+               179      page-faults               #    0,010 K/sec                  
+    68.986.192.245      cycles                    #    3,891 GHz                    
+       445.555.610      stalled-cycles-frontend   #    0,65% frontend cycles idle   
+    45.969.107.909      stalled-cycles-backend    #   66,64% backend cycles idle    
+    65.231.036.165      instructions              #    0,95  insn per cycle         
+                                                  #    0,70  stalled cycles per insn
+    11.187.947.898      branches                  #  630,952 M/sec                  
+       335.893.960      branch-misses             #    3,00% of all branches        
+
+       6,008454599 seconds time elapsed
+
+      17,572007000 seconds user
+       0,151827000 seconds sys
+
+
+usando 4 cores
+# Número de partículas:      500
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	416.666667	-2588.188939	26.595090
+1.100000	454.545455	-2764.277569	16.360278
+1.000000	500.000000	-2394.710256	14.192720
+0.900000	555.555556	-2420.542514	8.651578
+0.800000	625.000000	-2277.804845	5.061239
+0.700000	714.285714	-2043.073547	2.909724
+0.600000	833.333333	-1777.593342	1.685368
+0.500000	1000.000000	-1490.788581	1.049524
+0.400000	1250.000000	-1201.240533	0.689854
+
+ Performance counter stats for './tiny_md':
+
+         20.766,27 msec task-clock                #    3,909 CPUs utilized          
+            13.311      context-switches          #    0,641 K/sec                  
+                17      cpu-migrations            #    0,001 K/sec                  
+               188      page-faults               #    0,009 K/sec                  
+    80.571.365.232      cycles                    #    3,880 GHz                    
+       428.048.189      stalled-cycles-frontend   #    0,53% frontend cycles idle   
+    57.764.382.477      stalled-cycles-backend    #   71,69% backend cycles idle    
+    69.859.756.711      instructions              #    0,87  insn per cycle         
+                                                  #    0,83  stalled cycles per insn
+    12.689.198.215      branches                  #  611,049 M/sec                  
+       292.693.629      branch-misses             #    2,31% of all branches        
+
+       5,312627286 seconds time elapsed
+
+      20,531383000 seconds user
+       0,219907000 seconds sys
+
+
+usando 5 cores
+# Número de partículas:      500
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	416.666667	-2569.838620	26.011942
+1.100000	454.545455	-2721.632058	16.076765
+1.000000	500.000000	-2346.172252	13.786435
+0.900000	555.555556	-2350.862851	8.418402
+0.800000	625.000000	-2224.025698	4.958981
+0.700000	714.285714	-2004.212704	2.867896
+0.600000	833.333333	-1729.939995	1.685455
+0.500000	1000.000000	-1450.926925	1.024644
+0.400000	1250.000000	-1149.801935	0.676685
+
+ Performance counter stats for './tiny_md':
+
+         24.562,42 msec task-clock                #    4,942 CPUs utilized          
+            13.397      context-switches          #    0,545 K/sec                  
+                12      cpu-migrations            #    0,000 K/sec                  
+               197      page-faults               #    0,008 K/sec                  
+    95.375.614.869      cycles                    #    3,883 GHz                    
+       339.952.742      stalled-cycles-frontend   #    0,36% frontend cycles idle   
+    73.739.246.768      stalled-cycles-backend    #   77,31% backend cycles idle    
+    74.577.266.733      instructions              #    0,78  insn per cycle         
+                                                  #    0,99  stalled cycles per insn
+    14.229.633.652      branches                  #  579,325 M/sec                  
+       225.628.747      branch-misses             #    1,59% of all branches        
+
+       4,969995626 seconds time elapsed
+
+      24,284504000 seconds user
+       0,263527000 seconds sys
+
+
+usando 6 cores
+# Número de partículas:      500
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	416.666667	-2519.986831	25.737930
+1.100000	454.545455	-2636.846137	15.471523
+1.000000	500.000000	-2293.669950	13.609789
+0.900000	555.555556	-2298.202878	8.163407
+0.800000	625.000000	-2165.502234	4.776692
+0.700000	714.285714	-1949.489553	2.839575
+0.600000	833.333333	-1698.850932	1.625209
+0.500000	1000.000000	-1423.438947	1.026238
+0.400000	1250.000000	-1118.176846	0.694701
+
+ Performance counter stats for './tiny_md':
+
+         34.038,17 msec task-clock                #    5,323 CPUs utilized          
+           116.985      context-switches          #    0,003 M/sec                  
+                39      cpu-migrations            #    0,001 K/sec                  
+               200      page-faults               #    0,006 K/sec                  
+   131.314.957.230      cycles                    #    3,858 GHz                    
+       552.770.181      stalled-cycles-frontend   #    0,42% frontend cycles idle   
+   103.856.233.431      stalled-cycles-backend    #   79,09% backend cycles idle    
+    95.848.849.205      instructions              #    0,73  insn per cycle         
+                                                  #    1,08  stalled cycles per insn
+    21.167.230.627      branches                  #  621,867 M/sec                  
+       220.348.218      branch-misses             #    1,04% of all branches        
+
+       6,394973016 seconds time elapsed
+
+      33,225762000 seconds user
+       0,723249000 seconds sys

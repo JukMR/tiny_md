@@ -6,14 +6,24 @@ import sys
 from statistics import stdev, mean
 from functools import reduce
 
+from time import time
+
 import matplotlib.pyplot as plt
 
 # Generate sub-process that execute tiny_md
-def run_debug(number, bash_cmd_list):
+def run_debug(number, bash_cmd_list, execution=False):
     for i in range(number):
         bashCmd = bash_cmd_list
-        process = subprocess.Popen(bashCmd, shell=True,)
-        output, error = process.communicate()
+        if execution:
+            start_time = time()
+            process = subprocess.Popen(bashCmd, shell=True,)
+            output, error = process.communicate()
+
+            end_time = time() - start_time
+            print(f"El proceso tomo {end_time}")
+        else:
+            process = subprocess.Popen(bashCmd, shell=True,)
+            output, error = process.communicate()
         if (error is not None):
             print(f"The output is:{output}. The errors are:{error}")
             sys.exit("An error has ocurred")
@@ -21,7 +31,7 @@ def run_debug(number, bash_cmd_list):
 
 def run(makecmd, runcmd, niterations=10):
     run_debug(1, makecmd)
-    run_debug(niterations, runcmd)
+    run_debug(niterations, runcmd, execution=True)
 
 
 def Average(lst):

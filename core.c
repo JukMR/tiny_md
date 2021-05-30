@@ -117,16 +117,21 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
     #pragma omp parallel num_threads(10) // shared(epotshared,presshared)
     {
     //for (int j=0;j<25;++j){
+     double epot_aux=0;
+     double pres_aux=0;
      #pragma omp for  //reduction (+:fx) reduction (+:fy) reduction (+:fz)
      for (int i = 0; i < N-1; i+=1){
     //  for (int i=N/25*j ; i< N/25*(j+1)-1 ;i+=1){
     //	 #pragma omp critical
-          forces(rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L, i); // actualizo fuerzas
+          forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, temp, rho, V, L, i); // actualizo fuerzas
         //  forces(rx, ry, rz, fx, fy, fz, &epotshared, &presshared, temp, rho, V, L, i); // actualizo fuerzas
       }
   //   for (int i = 500; i < N-1; i+=1){
   //  //  for (int i=N/25*j ; i< N/25*(j+1)-1 ;i+=1){
   //        forces(rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L, i); // actualizo fuerzas
+
+    *epot+=epot_aux;// aca no se como hacer la suma, como se hace en openmp ??? 
+    *pres+=pres_aux;
     }
      //*epot=epotshared;
      //*pres=presshared;

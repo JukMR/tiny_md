@@ -103,8 +103,8 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
         vy[i] += 0.5 * fy[i] * DT;
         vz[i] += 0.5 * fz[i] * DT;
     }
-//    *epot=0;
-     //int i=0;
+
+    ////////////////////////////////////
     for (int j = 0; j <  N; j++) {
         fx[j] = 0.0;
         fy[j] = 0.0;
@@ -112,7 +112,7 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
     }
     *epot=0;
     *pres=*temp* rho ;
-    #pragma omp parallel num_threads(10)
+    #pragma omp parallel num_threads(6)
     {
      double epot_aux=0;
      double pres_aux=0;

@@ -141,10 +141,32 @@ static void idle_func(void)
         init_pos(rx, ry, rz, Rho);
         init_vel(vx, vy, vz, &Temp, &Ekin);
 
-        for (int row = 0; row < N-1; row++)
-        {
-            forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size, row);
-        }
+            for (int j = 0; j <  N; j++) {
+              fx[j] = 0.0;
+              fy[j] = 0.0;
+              fz[j] = 0.0;
+            }
+            Epot=0;
+            Pres=Temp* Rho ;
+            #pragma omp parallel num_threads(6)
+            {
+            double epot_aux=0;
+            double pres_aux=0;
+             #pragma omp for
+             for (int i = 0; i < N-1; i+=1){
+                forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, &Temp, Rho, V, box_size, i);
+              }
+             #pragma omp critical
+             Epot+=epot_aux;
+             Pres+=pres_aux;
+            }
+
+
+
+//        for (int row = 0; row < N-1; row++)
+//        {
+//            forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size, row);
+//        }
 
 
         switcher = 0;
@@ -171,10 +193,32 @@ static void idle_func(void)
         }
         init_vel(vx, vy, vz, &Temp, &Ekin);
 
-        for (int row = 0; row < N-1; row++)
-        {
-            forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size, row);
-        }
+            for (int j = 0; j <  N; j++) {
+              fx[j] = 0.0;
+              fy[j] = 0.0;
+              fz[j] = 0.0;
+            }
+            Epot=0;
+            Pres=Temp* Rho ;
+            #pragma omp parallel num_threads(6)
+            {
+            double epot_aux=0;
+            double pres_aux=0;
+             #pragma omp for
+             for (int i = 0; i < N-1; i+=1){
+                forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, &Temp, Rho, V, box_size,i);
+              }
+             #pragma omp critical
+             Epot+=epot_aux;
+             Pres+=pres_aux;
+            }
+
+
+
+//        for (int row = 0; row < N-1; row++)
+//        {
+//            forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size, row);
+//        }
 
         switcher = 0;
         if (fabs(Rho - (RHOI - 0.9f)) < 1e-6) {
@@ -301,10 +345,32 @@ int main(int argc, char** argv)
     init_pos(rx, ry, rz, Rho);
     init_vel(vx, vy, vz, &Temp, &Ekin);
 
-    for (int row = 0; row < N-1; row++)
-    {
-        forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size, row);
-    }
+            for (int j = 0; j <  N; j++) {
+              fx[j] = 0.0;
+              fy[j] = 0.0;
+              fz[j] = 0.0;
+            }
+            Epot=0;
+            Pres=Temp* Rho ;
+            #pragma omp parallel num_threads(6)
+            {
+            double epot_aux=0;
+            double pres_aux=0;
+             #pragma omp for
+             for (int i = 0; i < N-1; i+=1){
+                forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, &Temp, Rho, V, box_size,i);
+              }
+             #pragma omp critical
+             Epot+=epot_aux;
+             Pres+=pres_aux;
+            }
+
+
+
+//    for (int row = 0; row < N-1; row++)
+//    {
+//        forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, V, box_size, row);
+//    }
 
 
 

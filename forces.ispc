@@ -106,11 +106,11 @@ export void forces(const double uniform rx[],
         fy[row] += reduce_add(fyi);
         fz[row] += reduce_add(fzi);
         *epot +=reduce_add(epot_partial)/2;
-        pres_vir += reduce_add(pres_vir_partial)/2;
+        *pres += reduce_add(pres_vir_partial)/2/(V*3.0d);
   //}
-   pres_vir /= (V * 3.0d);
+//   pres_vir /= (V * 3.0d);
    //*pres = *temp * rho + pres_vir; // revisar
-   *pres += pres_vir; // revisar
+  // *pres += pres_vir; // revisar
 
 
 }

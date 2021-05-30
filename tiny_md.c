@@ -73,11 +73,11 @@ int main()
             }
             Epot=0;
             Pres=Temp* Rho ;
-	    #pragma omp parallel num_threads(10)
+	    #pragma omp parallel num_threads(6)
    	    {
             double epot_aux=0;
             double pres_aux=0;
-     	     #pragma omp for  //reduction (+:fx) reduction (+:fy) reduction (+:fz)
+     	     #pragma omp for
              for (int i = 0; i < N-1; i+=1){
                 forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, &Temp, Rho, cell_V, cell_L, i); // actualizo fuerzas
               }

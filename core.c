@@ -104,25 +104,25 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
         vz[i] += 0.5 * fz[i] * DT;
     }
 
-    ////////////////////////////////////
-    for (int j = 0; j <  N; j++) {
+    for (int j = 0; j < N; j++) {
         fx[j] = 0.0;
         fy[j] = 0.0;
         fz[j] = 0.0;
     }
-    *epot=0;
-    *pres=*temp* rho ;
-    #pragma omp parallel num_threads(6)
+    *epot = 0;
+    *pres = *temp * rho;
+    #pragma omp parallel
     {
-     double epot_aux=0;
-     double pres_aux=0;
-     #pragma omp for
-     for (int i = 0; i < N-1; i+=1){
-          forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, temp, rho, V, L, i); // actualizo fuerzas
-      }
-    #pragma omp critical
-    *epot+=epot_aux;
-    *pres+=pres_aux;
+        double epot_aux = 0;
+        double pres_aux = 0;
+
+        #pragma omp for
+        for (int i = 0; i < N - 1; i += 1) {
+            forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, temp, rho, V, L, i); // actualizo fuerzas
+        }
+        #pragma omp critical
+        *epot += epot_aux;
+        *pres += pres_aux;
     }
 
 

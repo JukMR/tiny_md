@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//#include <omp.h>
+#include <omp.h>
 int main()
 {
     FILE *file_xyz, *file_thermo;
@@ -73,7 +73,7 @@ int main()
             }
             Epot=0;
             Pres=Temp* Rho ;
-	    #pragma omp parallel num_threads(6)
+	    #pragma omp parallel
    	    {
             double epot_aux=0;
             double pres_aux=0;
@@ -86,10 +86,7 @@ int main()
              Pres+=pres_aux;
             }
 
-         //   for(int row = 0 ; row < N-1 ; row++) {
-         //       forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho,
-         //              cell_V, cell_L, row );
-         //   }
+
         for (i = 1; i < TEQ; i++) { // loop de equilibracion
 
             velocity_verlet(rx, ry, rz, vx, vy, vz, fx, fy, fz, &Epot, &Ekin, &Pres, &Temp, Rho, cell_V, cell_L);

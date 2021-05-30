@@ -75,12 +75,16 @@ int main()
             Pres=Temp* Rho ;
 	    #pragma omp parallel num_threads(10)
    	    {
-    		//for (int j=0;j<25;++j){
+            double epot_aux=0;
+            double pres_aux=0;
      	     #pragma omp for  //reduction (+:fx) reduction (+:fy) reduction (+:fz)
              for (int i = 0; i < N-1; i+=1){
-                forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho, cell_V, cell_L, i); // actualizo fuerzas
-             }
-	    }
+                forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, &Temp, Rho, cell_V, cell_L, i); // actualizo fuerzas
+              }
+             #pragma omp critical
+             Epot+=epot_aux;
+             Pres+=pres_aux;
+            }
 
          //   for(int row = 0 ; row < N-1 ; row++) {
          //       forces(rx, ry, rz, fx, fy, fz, &Epot, &Pres, &Temp, Rho,

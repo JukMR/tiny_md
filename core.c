@@ -119,7 +119,7 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
     //for (int j=0;j<25;++j){
      double epot_aux=0;
      double pres_aux=0;
-     #pragma omp for  //reduction (+:fx) reduction (+:fy) reduction (+:fz)
+     #pragma omp for //reduction (+:epot_aux,pres_aux) //reduction (+:fx) reduction (+:fy) reduction (+:fz)
      for (int i = 0; i < N-1; i+=1){
     //  for (int i=N/25*j ; i< N/25*(j+1)-1 ;i+=1){
     //	 #pragma omp critical
@@ -129,9 +129,11 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
   //   for (int i = 500; i < N-1; i+=1){
   //  //  for (int i=N/25*j ; i< N/25*(j+1)-1 ;i+=1){
   //        forces(rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L, i); // actualizo fuerzas
-
+   // omp_set_lock(&lck);
+    #pragma omp critical
     *epot+=epot_aux;// aca no se como hacer la suma, como se hace en openmp ??? 
     *pres+=pres_aux;
+    //omp_unset_lock(&lck);
     }
      //*epot=epotshared;
      //*pres=presshared;

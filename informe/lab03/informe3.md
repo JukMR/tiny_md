@@ -10,9 +10,9 @@ En este laboratorio buscamos modificar el código del problema para paralelizar
 su ejecución y así aprovechar todos los núcleos de los procesadores de `zx81` y
 `Jupiterace`.
 
-Para conseguir esto, queriamos mantener la implementación que hicimos de
-`forces` en ISPC del laboratorio anterior, es por esto que la modificacion
-consistió en trabajar sobre el calculo de cada fila de la matriz de fuerzas
+Para conseguir esto, queríamos mantener la implementación que hicimos de
+`forces` en ISPC del laboratorio anterior, es por esto que la modificación
+consistió en trabajar sobre el cálculo de cada fila de la matriz de fuerzas
 independientemente. Es decir, ya no utilizamos solamente la matriz diagonal
 superior. De esta forma, conseguimos que no existan `race conditions` de
 escritura entre vecinos.
@@ -120,7 +120,7 @@ export void forces(const double uniform rx[],
 }
 ```
 
-Principalmente los cambios que introdujimos son los siguientes:
+Principalmente los cambios que introducimos son los siguientes:
 
 
 * Forces ahora recibe el i correspondiente a la columna de la matriz de fuerzas
@@ -128,19 +128,29 @@ Principalmente los cambios que introdujimos son los siguientes:
 
 * Cambiar los límites del ciclo internet de i+1 a N-1 por 0 hasta N-1 y
   eliminamos las actualizaciones de las fuerzas de los vecinos. De esta manera
-  estamos calculando las fuerzas para cada i individualmente unicamente evitando
+  estamos calculando las fuerzas para cada i individualmente únicamente evitando
   los problemas de actualización a memoria entre hilos.
 
 * Como ahora recorremos toda la matriz, ahora debemos evitar escribir dos veces
   sobre la diagonal. Por ello, agregamos el condicional `if(j != row)`.
 
-* Al recorrer toda la matriz, debemos dividir la acumulacion de `epot` y `pres`
+* Al recorrer toda la matriz, debemos dividir la acumulación de `epot` y `pres`
   por dos para no estar sumando dos veces los mismos valores.
+
+## Idea física para independizarnos de las partículas
+El concepto físico en que nos basamos para calcular las partículas de forma 
+independiente consiste en: basado en el hecho de que los potenciales 
+Vij=Vji podemos remplazar la sumatoria (bucle interno) por una sumatoria
+que comience desde cero y finalemente dividir los resultados a la mitad. Esto se 
+representa en las siguientes ecuaciones
+
+
+![Ecuaciones en que nos basamos para implementar forces](Figures/suma.jpg)
 
 
 ## Llamada a forces
 
-Ahora el bucle que itera sobre i se declara fuera de la funcion. Así, se pueden
+Ahora el bucle que itera sobre i se declara fuera de la función. Así, se pueden
 llamar a N-1 instancias de forces para que se ejecuten en paralelo.
 
 ``` C
@@ -168,7 +178,7 @@ son las encargadas de acumular las variaciones de `epot` y `pres` para cada
 hilo. Luego mediante el uso de la sección critica podemos acumular los
 resultados en las variables originales.
 
-Si no aplicaramos esta sincronizacion entre hilos tendriamos una
+Si no aplicaramos esta sincronización entre hilos tendríamos una
 `race condition` de `RAW` (o read after write).
 
 ## Plataforma de cálculos
@@ -193,7 +203,7 @@ Memoria:
 
 ## Compiladores
 
-En este laboratorio utilizamos GCC-10 para la obtención de las metricas:
+En este laboratorio utilizamos GCC-10 para la obtención de las métricas:
 
 * GCC-10 (gcc version 10.2.1 20210110 (Debian 10.2.1-6))
 
@@ -408,8 +418,8 @@ Laboratorio 3:
 
 * Usando GCC
 * 4.67 GFlops con 24 hilos
-* Sobre version con forces en ispc y forces calculado usando OpenMP
-* Tamaño de simulacion N=500
+* Sobre versión con forces en ispc y forces calculado usando OpenMP
+* Tamaño de simulación N=500
 
 
 
@@ -447,8 +457,8 @@ Laboratorio 3:
 
 * Usando GCC
 * 11.865 GFlops con 28 hilos
-* Sobre version con forces en ISPC y forces calculado usando OpenMP
-* Tamaño de simulacion N=10976
+* Sobre versión con forces en ISPC y forces calculado usando OpenMP
+* Tamaño de simulación N=10976
 
 
 
@@ -480,7 +490,7 @@ Siguiendo la formula del teórico, donde Sp es el speedup, T1 es el tiempo con 1
 
 * Y el mejor valor de la eficiencia es de (Sp=3.566) / (p=24) = 0.15 %
 
-o tambien podria escribirse como:
+o también podría escribirse como:
 
 * Eficiencia : (T1=12.80) / (p=24) x (Tp=3.589)  = 0.15 %
 
@@ -491,22 +501,22 @@ Este valor nos dice que estamos obteniendo un `speedup sublinear`
 # Roofline con N=500
 
 En el siguiente gráfico obtenido con `Intel Advisor-Gui` podemos ver donde está
-ubicado nuestro problema respecto a la intensidad aritmetica, el límite
+ubicado nuestro problema respecto a la intensidad aritmética, el límite
 de la velocidad de la memoria y la potencia de los procesadores.
 
 ![Roofline_con_N=500](Figures/roofline.png)
 
 Comentarios:
 
-* Vemos una intensidad aritmetica de `0.525 FLOP/Byte`.
+* Vemos una intensidad aritmética de `0.525 FLOP/Byte`.
 
 * El programa arroja una métrica, quizas más correcta que la que utilizamos, de `18.275 GFlops`.
 
-* Para el punto de intensaidad aritmetica donde nos encontramos, el
-  limite teórico impuesto por la veloc. de la memoria es de `29.63 Gflops` y
+* Para el punto de intensidad aritmética donde nos encontramos, el
+  limite teórico impuesto por la velocidade de la memoria es de `29.63 Gflops` y
   nosotros registramos `18.275 Gflops`.
 
-    * Esto ultimo nos dice que todavia podriamos mejorar cerca de un 60% la performance de nuestro problema.
+    * Esto último nos dice que todavía podríamos mejorar cerca de un 60% la performance de nuestro problema.
 
 
 # Conclusiones

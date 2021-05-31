@@ -138,14 +138,14 @@ Principalmente los cambios que introducimos son los siguientes:
   por dos para no estar sumando dos veces los mismos valores.
 
 ## Idea física para independizarnos de las partículas
-El concepto físico en que nos basamos para calcular las partículas de forma 
-independiente consiste en: basado en el hecho de que los potenciales 
+El concepto físico en que nos basamos para calcular las partículas de forma
+independiente consiste en: basado en el hecho de que los potenciales
 Vij=Vji podemos remplazar la sumatoria (bucle interno) por una sumatoria
-que comience desde cero y finalemente dividir los resultados a la mitad. Esto se 
-representa en las siguientes ecuaciones
+que comience desde cero y finalmente dividir los resultados a la mitad. Esto se
+representa en las siguientes ecuaciones:
 
 
-![Ecuaciones en que nos basamos para implementar forces](Figures/suma.jpg)
+![Ecuaciones en que nos basamos para implementar forces](Figures/suma.jpeg)
 
 
 ## Llamada a forces

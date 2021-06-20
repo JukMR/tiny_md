@@ -106,20 +106,22 @@ __global__ void forces(const double* rx,
 void launch_forces(const double* rx, const double* ry, const double* rz,
                    double* fx, double* fy, double* fz, double* epot,
                    double* pres, const double* temp, const double rho,
-                   const double V, const double L, const int row)
+                   const double V, const double L)
 {
 
     int block_size = N;
     // int num_blocks = N;
 
-    dim3 block(block_size);
-    dim3 grid(block_size);
+    dim3 block(1);
+    dim3 grid(1);
 
 
-
+    for(size_t i = 0; i < N-1; i++ ) {
     forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho,
-                              V, L, row);
+                              V, L, i);
+
     checkCudaCall(cudaGetLastError());
     checkCudaCall(cudaDeviceSynchronize());
+    }
 }
 

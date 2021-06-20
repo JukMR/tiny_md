@@ -113,11 +113,11 @@ int main()
             *pres_aux=0;
             *ptr_Temp = Temp;
 
-            for (int i = 0; i < N-1; i+=1){
-                launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, Rho, cell_V, cell_L, i); // actualizo fuerzas
+            // for (int i = 0; i < N-1; i+=1){
+                launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, Rho, cell_V, cell_L); // actualizo fuerzas
 
                 Temp = *ptr_Temp;
-            }
+            // }
 
              Epot+=*epot_aux;
              Pres+=*pres_aux;

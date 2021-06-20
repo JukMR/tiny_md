@@ -168,9 +168,9 @@ static void idle_func(void)
             *pres_aux=0;
             *ptr_Temp = Temp;
 
-            for (int i = 0; i < N - 1; i += 1) {
-                launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, Rho, V, box_size, i);
-            }
+            // for (int i = 0; i < N - 1; i += 1) {
+                launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, Rho, V, box_size);
+            // }
             Epot += *epot_aux;
             Pres += *pres_aux;
 
@@ -226,9 +226,9 @@ static void idle_func(void)
             *ptr_Temp = Temp;
 
             // #pragma omp for
-            for (int i = 0; i < N - 1; i += 1) {
-                launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, Rho, V, box_size, i);
-            }
+            // for (int i = 0; i < N - 1; i += 1) {
+                launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, Rho, V, box_size);
+            // }
             // #pragma omp critical
             Epot += *epot_aux;
             Pres += *pres_aux;
@@ -408,9 +408,9 @@ int main(int argc, char** argv)
             *ptr_Temp = Temp;
 
             // #pragma omp for
-            for (int i = 0; i < N - 1; i += 1) {
-                launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, Rho, V, box_size, i);
-            }
+            // for (int i = 0; i < N - 1; i += 1) {
+                launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, Rho, V, box_size);
+            // }
             // #pragma omp critical
             Epot += *epot_aux;
             Pres += *pres_aux;

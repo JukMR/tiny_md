@@ -129,9 +129,9 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
             *pres_aux=0;
             *ptr_Temp = *temp;
 
-        for (int i = 0; i < N - 1; i += 1) {
-            launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, rho, V, L, i); // actualizo fuerzas
-        }
+        // for (int i = 0; i < N - 1; i += 1) {
+            launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, rho, V, L); // actualizo fuerzas
+        // }
         *epot += *epot_aux;
         *pres += *pres_aux;
 

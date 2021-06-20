@@ -1,6 +1,6 @@
 // Variables necesarias
 
-#include <cuda.h>
+// #include <cuda.h> // no se porque esto rompe todo
 #include <cuda_runtime.h>
 #include "helper_cuda.h" // checkCudaCall
 #include "parameters.h"

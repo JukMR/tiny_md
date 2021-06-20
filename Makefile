@@ -1,5 +1,5 @@
 CU=nvcc
-CUFLAGS=-O2 -Xcompiler=-Wall -Xcompiler=-Wextra
+CUFLAGS=-O2 -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=$(particles)
 
 CC      = gcc-10
 CFLAGS  = -ffast-math -O3 -march=native $(particles)
@@ -10,7 +10,7 @@ SOURCES	= $(shell echo *.cu)
 OBJECTS = core.o wtime.o forces_gpu.o
 
 particles = -DN=$(N)
-N = 256
+N = 32
 
 all: $(TARGETS)
 

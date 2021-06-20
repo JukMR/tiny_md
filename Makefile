@@ -1,36 +1,36 @@
-CC      = gcc
-CFLAGS  = -fopenmp -ffast-math -O3 -march=native $(particles)
+CU=nvcc
+CUFLAGS=-O2 -Xcompiler=-Wall -Xcompiler=-Wextra
+
+CC      = gcc-10
+CFLAGS  = -ffast-math -O3 -march=native $(particles)
 WFLAGS	= -std=c11 -Wall -Wextra -g
 LDFLAGS	= -lm -lgomp
 TARGETS	= tiny_md viz
-SOURCES	= $(shell echo *.c)
-OBJECTS = core.o wtime.o forces.o
-
-ispc = /opt/ispc/1.15.0/bin/ispc
-ispc_flags = -g -O3 --target=avx2-i64x4 --cpu=core-avx2 $(particles) --pic
+SOURCES	= $(shell echo *.cu)
+OBJECTS = core.o wtime.o forces_gpu.o
 
 particles = -DN=$(N)
-N=500
+N = 500
 
-all: pre-build $(TARGETS)
-
-pre-build:
-	$(ispc) $(ispc_flags) forces.ispc -o forces.o -h forces.h
+all: $(TARGETS)
 
 viz: viz.o $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -lGL -lGLU -lglut
+	$(CU) $(CUFLAGS) -o $@ $^ $(LDFLAGS) -lGL -lGLU -lglut
 
 tiny_md: tiny_md.o $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CU) $(CUFLAGS) -o $@ $^ $(LDFLAGS)
 
-%.o: %.c
-	$(CC) $(WFLAGS) $(CPPFLAGS) $(CFLAGS) -c $<
+forces_gpu: forces_gpu.o $(OBJECTS)
+	$(CU) $(CUFLAGS) -o $@ $^ $(LDFLAGS)
+
+%.o: %.cu
+	$(CU) $(CUFLAGS) -o $@ -c $<
 
 clean:
 	rm -f $(TARGETS) *.o *.xyz *.log .depend
 
 .depend: $(SOURCES)
-	$(CC) -MM $^ > $@
+	$(CU) -MM $^ > $@
 
 -include .depend
 .PHONY: clean all

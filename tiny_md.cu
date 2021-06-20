@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
+#include <cuda_runtime.h>
 #include "forces_gpu.h"
 #include "helper_cuda.h"
 
@@ -98,18 +98,33 @@ int main()
             }
             Epot=0;
             Pres=Temp* Rho ;
-	    // #pragma omp parallel
-   	    {
-            double epot_aux=0;
-            double pres_aux=0;
-     	    //  #pragma omp for
-             for (int i = 0; i < N-1; i+=1){
-                launch_forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, &Temp, Rho, cell_V, cell_L, i); // actualizo fuerzas
-              }
-            //  #pragma omp critical
-             Epot+=epot_aux;
-             Pres+=pres_aux;
+
+
+            double *epot_aux;
+            double *pres_aux;
+            double *ptr_Temp;
+
+
+            checkCudaCall(cudaMallocManaged(&epot_aux, sizeof(double *)));
+            checkCudaCall(cudaMallocManaged(&pres_aux, sizeof(double *)));
+            checkCudaCall(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
+
+            *epot_aux=0;
+            *pres_aux=0;
+            *ptr_Temp = Temp;
+
+            for (int i = 0; i < N-1; i+=1){
+                launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, Rho, cell_V, cell_L, i); // actualizo fuerzas
+
+                Temp = *ptr_Temp;
             }
+
+             Epot+=*epot_aux;
+             Pres+=*pres_aux;
+
+            checkCudaCall(cudaFree(epot_aux));
+            checkCudaCall(cudaFree(pres_aux));
+            checkCudaCall(cudaFree(ptr_Temp));
 
 
         for (i = 1; i < TEQ; i++) { // loop de equilibracion
@@ -174,5 +189,17 @@ int main()
     fprintf(logs, "# Tiempo simulado = %f [fs]\n", t * 1.6);
     fprintf(logs, "# ns/day = %f\n", (1.6e-6 * t) / elapsed * 86400);
     //                       ^1.6 fs -> ns       ^sec -> day
+
+
+    checkCudaCall(cudaFree(rx));
+    checkCudaCall(cudaFree(ry));
+    checkCudaCall(cudaFree(rz));
+    checkCudaCall(cudaFree(vx));
+    checkCudaCall(cudaFree(vy));
+    checkCudaCall(cudaFree(vz));
+    checkCudaCall(cudaFree(fx));
+    checkCudaCall(cudaFree(fy));
+    checkCudaCall(cudaFree(fz));
+
     return 0;
 }

@@ -1,12 +1,10 @@
 // Variables necesarias
 
 #include <cuda.h>
+#include <cuda_runtime.h>
 #include "helper_cuda.h" // checkCudaCall
 #include "parameters.h"
 #include <cstdio>
-
-
-#define BLOCK_SIZE 128
 
 
 //#define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
@@ -103,7 +101,6 @@ __global__ void forces(const double* rx,
 
 }
 
-// #define BLOCK_SIZE 128
 
 
 void launch_forces(const double* rx, const double* ry, const double* rz,
@@ -111,12 +108,12 @@ void launch_forces(const double* rx, const double* ry, const double* rz,
                    double* pres, const double* temp, const double rho,
                    const double V, const double L, const int row)
 {
-    // int block_size = BLOCK_SIZE;
-    // int block_size = N;
+
+    int block_size = N;
     // int num_blocks = N;
 
-    dim3 block(N);
-    dim3 grid(N);
+    dim3 block(block_size);
+    dim3 grid(block_size);
 
 
 

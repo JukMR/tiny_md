@@ -6,8 +6,9 @@
 
 #include <omp.h>
 
+#include <cuda_runtime.h>
 #include "forces_gpu.h"
-
+#include "helper_cuda.h"
 
 
 void init_pos(double* rx, double* ry, double* rz, const double rho)
@@ -115,14 +116,28 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
     *epot = 0;
     *pres = *temp * rho;
     {
-        double epot_aux = 0;
-        double pres_aux = 0;
+            double *epot_aux;
+            double *pres_aux;
+            double *ptr_Temp;
+
+
+            checkCudaCall(cudaMallocManaged(&epot_aux, sizeof(double *)));
+            checkCudaCall(cudaMallocManaged(&pres_aux, sizeof(double *)));
+            checkCudaCall(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
+
+            *epot_aux=0;
+            *pres_aux=0;
+            *ptr_Temp = *temp;
 
         for (int i = 0; i < N - 1; i += 1) {
-            launch_forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, temp, rho, V, L, i); // actualizo fuerzas
+            launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, rho, V, L, i); // actualizo fuerzas
         }
-        *epot += epot_aux;
-        *pres += pres_aux;
+        *epot += *epot_aux;
+        *pres += *pres_aux;
+
+        checkCudaCall(cudaFree(epot_aux));
+        checkCudaCall(cudaFree(pres_aux));
+        checkCudaCall(cudaFree(ptr_Temp));
     }
 
 

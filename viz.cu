@@ -8,8 +8,9 @@
 #include <stdlib.h>
 
 
+#include <cuda_runtime.h>
 #include "forces_gpu.h"
-
+#include "helper_cuda.h"
 
 // variables globales
 static double Ekin, Epot, Temp, Pres; // variables macroscopicas
@@ -154,15 +155,28 @@ static void idle_func(void)
         Pres = Temp * Rho;
         // #pragma omp parallel
         {
-            double epot_aux = 0;
-            double pres_aux = 0;
-            // #pragma omp for
+            double *epot_aux;
+            double *pres_aux;
+            double *ptr_Temp;
+
+
+            checkCudaCall(cudaMallocManaged(&epot_aux, sizeof(double *)));
+            checkCudaCall(cudaMallocManaged(&pres_aux, sizeof(double *)));
+            checkCudaCall(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
+
+            *epot_aux=0;
+            *pres_aux=0;
+            *ptr_Temp = Temp;
+
             for (int i = 0; i < N - 1; i += 1) {
-                launch_forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, &Temp, Rho, V, box_size, i);
+                launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, Rho, V, box_size, i);
             }
-            // #pragma omp critical
-            Epot += epot_aux;
-            Pres += pres_aux;
+            Epot += *epot_aux;
+            Pres += *pres_aux;
+
+            checkCudaCall(cudaFree(epot_aux));
+            checkCudaCall(cudaFree(pres_aux));
+            checkCudaCall(cudaFree(ptr_Temp));
         }
 
         switcher = 0;
@@ -198,15 +212,30 @@ static void idle_func(void)
         Pres = Temp * Rho;
         // #pragma omp parallel
         {
-            double epot_aux = 0;
-            double pres_aux = 0;
+            double *epot_aux;
+            double *pres_aux;
+            double *ptr_Temp;
+
+
+            checkCudaCall(cudaMallocManaged(&epot_aux, sizeof(double *)));
+            checkCudaCall(cudaMallocManaged(&pres_aux, sizeof(double *)));
+            checkCudaCall(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
+
+            *epot_aux=0;
+            *pres_aux=0;
+            *ptr_Temp = Temp;
+
             // #pragma omp for
             for (int i = 0; i < N - 1; i += 1) {
-                launch_forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, &Temp, Rho, V, box_size, i);
+                launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, Rho, V, box_size, i);
             }
             // #pragma omp critical
-            Epot += epot_aux;
-            Pres += pres_aux;
+            Epot += *epot_aux;
+            Pres += *pres_aux;
+
+            checkCudaCall(cudaFree(epot_aux));
+            checkCudaCall(cudaFree(pres_aux));
+            checkCudaCall(cudaFree(ptr_Temp));
         }
 
         switcher = 0;
@@ -310,15 +339,37 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
 
-    rx = (double*)malloc(N * sizeof(double));
-    ry = (double*)malloc(N * sizeof(double));
-    rz = (double*)malloc(N * sizeof(double));
-    vx = (double*)malloc(N * sizeof(double));
-    vy = (double*)malloc(N * sizeof(double));
-    vz = (double*)malloc(N * sizeof(double));
-    fx = (double*)malloc(N * sizeof(double));
-    fy = (double*)malloc(N * sizeof(double));
-    fz = (double*)malloc(N * sizeof(double));
+    // rx = (double*)malloc(N * sizeof(double));
+    // ry = (double*)malloc(N * sizeof(double));
+    // rz = (double*)malloc(N * sizeof(double));
+    // vx = (double*)malloc(N * sizeof(double));
+    // vy = (double*)malloc(N * sizeof(double));
+    // vz = (double*)malloc(N * sizeof(double));
+    // fx = (double*)malloc(N * sizeof(double));
+    // fy = (double*)malloc(N * sizeof(double));
+    // fz = (double*)malloc(N * sizeof(double));
+
+    checkCudaCall(cudaMallocManaged(&rx, N * sizeof(double *)));
+    checkCudaCall(cudaMallocManaged(&ry, N * sizeof(double *)));
+    checkCudaCall(cudaMallocManaged(&rz, N * sizeof(double *)));
+    checkCudaCall(cudaMallocManaged(&vx, N * sizeof(double *)));
+    checkCudaCall(cudaMallocManaged(&vy, N * sizeof(double *)));
+    checkCudaCall(cudaMallocManaged(&vz, N * sizeof(double *)));
+    checkCudaCall(cudaMallocManaged(&fx, N * sizeof(double *)));
+    checkCudaCall(cudaMallocManaged(&fy, N * sizeof(double *)));
+    checkCudaCall(cudaMallocManaged(&fz, N * sizeof(double *)));
+
+
+    checkCudaCall(cudaMemset(rx, 0, N * sizeof(double *)));
+    checkCudaCall(cudaMemset(ry, 0, N * sizeof(double *)));
+    checkCudaCall(cudaMemset(rz, 0, N * sizeof(double *)));
+    checkCudaCall(cudaMemset(vx, 0, N * sizeof(double *)));
+    checkCudaCall(cudaMemset(vy, 0, N * sizeof(double *)));
+    checkCudaCall(cudaMemset(vz, 0, N * sizeof(double *)));
+    checkCudaCall(cudaMemset(fx, 0, N * sizeof(double *)));
+    checkCudaCall(cudaMemset(fy, 0, N * sizeof(double *)));
+    checkCudaCall(cudaMemset(fz, 0, N * sizeof(double *)));
+
 
     // parametros iniciales para que los pueda usar (antes de modificar)
     // `idle_func`
@@ -342,17 +393,32 @@ int main(int argc, char** argv)
     Epot = 0;
     Pres = Temp * Rho;
     // #pragma omp parallel
-    {
-        double epot_aux = 0;
-        double pres_aux = 0;
-        // #pragma omp for
-        for (int i = 0; i < N - 1; i += 1) {
-            launch_forces(rx, ry, rz, fx, fy, fz, &epot_aux, &pres_aux, &Temp, Rho, V, box_size, i);
+        {
+            double *epot_aux;
+            double *pres_aux;
+            double *ptr_Temp;
+
+
+            checkCudaCall(cudaMallocManaged(&epot_aux, sizeof(double *)));
+            checkCudaCall(cudaMallocManaged(&pres_aux, sizeof(double *)));
+            checkCudaCall(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
+
+            *epot_aux=0;
+            *pres_aux=0;
+            *ptr_Temp = Temp;
+
+            // #pragma omp for
+            for (int i = 0; i < N - 1; i += 1) {
+                launch_forces(rx, ry, rz, fx, fy, fz, epot_aux, pres_aux, ptr_Temp, Rho, V, box_size, i);
+            }
+            // #pragma omp critical
+            Epot += *epot_aux;
+            Pres += *pres_aux;
+
+            checkCudaCall(cudaFree(epot_aux));
+            checkCudaCall(cudaFree(pres_aux));
+            checkCudaCall(cudaFree(ptr_Temp));
         }
-        // #pragma omp critical
-        Epot += epot_aux;
-        Pres += pres_aux;
-    }
 
 
     printf("# Número de partículas:      %d\n", N);
@@ -364,6 +430,16 @@ int main(int argc, char** argv)
     open_glut_window();
 
     glutMainLoop();
+
+    checkCudaCall(cudaFree(rx));
+    checkCudaCall(cudaFree(ry));
+    checkCudaCall(cudaFree(rz));
+    checkCudaCall(cudaFree(vx));
+    checkCudaCall(cudaFree(vy));
+    checkCudaCall(cudaFree(vz));
+    checkCudaCall(cudaFree(fx));
+    checkCudaCall(cudaFree(fy));
+    checkCudaCall(cudaFree(fz));
 
     exit(0);
 }

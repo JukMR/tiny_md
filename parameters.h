@@ -13,7 +13,7 @@
 
 // Esta macro tambien esta definida en forces.ispc
 #ifndef N // número de particulas (debe ser un 4m^3 para el cristal inicial)
-#define N 500
+#define N 32
 #endif
 
 #ifndef SEED // rand SEED para las velocidades

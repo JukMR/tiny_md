@@ -1,4 +1,7 @@
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 500 // M_PI
+#endif
+
 #include "core.h"
 #include "parameters.h"
 

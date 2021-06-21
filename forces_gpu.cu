@@ -6,7 +6,7 @@
 #include "helper_cuda.h" // checkCudaCall
 #include "parameters.h"
 #include <cstdio>
-#include <cuda.h>
+// #include <cuda.h>
 
 // #include <cub/cub.cuh>
 
@@ -98,23 +98,25 @@ __global__ void forces(const double* rx,
     }
 
 
-    atomicAdd(&fx[row], fxi);
-    atomicAdd(&fy[row], fyi);
-    atomicAdd(&fz[row], fzi);
+    // atomicAdd(fx[row], fxi);
+    // atomicAdd(fy[row], fyi);
+    // atomicAdd(fz[row], fzi);
 
-    atomicAdd(&epot, epot_partial / 2);
-    atomicAdd(&pres, pres_vir_partial / 2 / (V * 3.0));
+    // atomicAdd(epot, epot_partial / 2);
+    // atomicAdd(pres, pres_vir_partial / 2 / (V * 3.0));
 
-    // fx[row] += fxi;
+    fx[row] += fxi;
 
-    // fy[row] += fyi;
-    // fz[row] += fzi;
+    fy[row] += fyi;
+    fz[row] += fzi;
     *epot += epot_partial / 2;
     *pres += pres_vir_partial / 2 / (V * 3.0);
 
 }
 
-
+int div_ceil(int a, int b) {
+    return (a + b - 1) / b;
+}
 
 void launch_forces(const double* rx, const double* ry, const double* rz,
                    double* fx, double* fy, double* fz, double* epot,
@@ -125,16 +127,16 @@ void launch_forces(const double* rx, const double* ry, const double* rz,
     // int block_size = N;
     // int num_blocks = N;
 
-    dim3 block(1);
-    dim3 grid(1);
+    dim3 block(16);
+    dim3 grid(div_ceil(N, block.x));
 
 
     for(size_t i = 0; i < N-1; i++ ) {
     forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho,
                               V, L, i);
 
+    }
     checkCudaCall(cudaGetLastError());
     checkCudaCall(cudaDeviceSynchronize());
-    }
 }
 

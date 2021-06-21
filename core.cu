@@ -1,10 +1,8 @@
 #include "core.h"
 #include "parameters.h"
 
-#include <math.h>
-#include <stdlib.h> // rand()
-
-#include <omp.h>
+#include <cmath>
+#include <cstdlib> // rand()
 
 #include <cuda_runtime.h>
 #include "forces_gpu.h"

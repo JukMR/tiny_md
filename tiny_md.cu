@@ -1,11 +1,13 @@
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 500 // M_PI
+#endif
 #include "core.h"
 #include "parameters.h"
 #include "wtime.h"
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
 
 #include <cuda_runtime.h>
 #include "forces_gpu.h"

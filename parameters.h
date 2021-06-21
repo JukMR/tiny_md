@@ -8,7 +8,7 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#include <time.h> // time(NULL)
+#include <ctime> // time(NULL)
 
 
 // Esta macro tambien esta definida en forces.ispc

@@ -26,6 +26,52 @@ __device__ void minimum_image(double cordi, const double cell_length, double* re
     *result = cordi;
 }
 
+// Esta función esta sacada de la wiki de Cuda. capaz sirve.
+
+
+// __device__ double atomicAdd(double* address, double val)
+// {
+//     unsigned long long int* address_as_ull =
+//                              (unsigned long long int*)address;
+//     unsigned long long int old = *address_as_ull, assumed;
+//     do {
+//         assumed = old;
+// old = atomicCAS(address_as_ull, assumed,
+//                         __double_as_longlong(val +
+//                                __longlong_as_double(assumed)));
+//     } while (assumed != old);
+//     return __longlong_as_double(old);
+// }
+
+
+
+// Algo asi capaz si se podria implementar para la reduccion con doubles.
+
+
+// __global__ void sum_shared_atomic(const int *in, int n, int *out)
+// {
+//     __shared__ int partial_sum;
+
+//     uint i = blockIdx.x * blockDim.x + threadIdx.x;
+
+//     if (threadIdx.x == 0) {
+//         partial_sum = 0;
+//     }
+
+//     __syncthreads();
+
+//     if (i < n) {
+//         atomicAdd(&partial_sum, in[i]);
+//     }
+
+//     __syncthreads();
+
+//     if (threadIdx.x == 0) {
+//         atomicAdd(out, partial_sum);
+//     }
+// }
+
+
 
 __global__ void forces(const double* rx,
                        const double* ry,
@@ -47,6 +93,8 @@ __global__ void forces(const double* rx,
     //        fz[row] = 0.0d;
 
     //    *epot = 0.0;
+    if (threadIdx.x == 0 ){
+    // printf("Soy el hilo %i", threadIdx.x); // esto funciona, solo el hilo 0 ejecuta esto
     double rcut2 = RCUT * RCUT;
     const double RCUT12 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT;
 
@@ -97,7 +145,7 @@ __global__ void forces(const double* rx,
         }
     }
 
-
+    // Estas funciones no parecen andar con doubles. Se podria investigar un poco más.
     // atomicAdd(fx[row], fxi);
     // atomicAdd(fy[row], fyi);
     // atomicAdd(fz[row], fzi);
@@ -113,7 +161,7 @@ __global__ void forces(const double* rx,
     *pres += pres_vir_partial / 2 / (V * 3.0);
 
 }
-
+}
 int div_ceil(int a, int b) {
     return (a + b - 1) / b;
 }
@@ -124,6 +172,8 @@ void launch_forces(const double* rx, const double* ry, const double* rz,
                    const double V, const double L)
 {
 
+    // Todavia no entiendo que numero de bloques y de grilla nos conviene usar para el problema
+
     // int block_size = N;
     // int num_blocks = N;
 
@@ -131,6 +181,7 @@ void launch_forces(const double* rx, const double* ry, const double* rz,
     dim3 grid(div_ceil(N, block.x));
 
 
+    // Este for probablemente no tendria que ir, deberiamos lanzar un kernel que haga esto segun el hilo en el que esta parado
     for(size_t i = 0; i < N-1; i++ ) {
     forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho,
                               V, L, i);

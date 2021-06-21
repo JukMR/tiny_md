@@ -1,10 +1,15 @@
 // Variables necesarias
 
 // #include <cuda.h> // no se porque esto rompe todo
+
 #include <cuda_runtime.h>
 #include "helper_cuda.h" // checkCudaCall
 #include "parameters.h"
 #include <cstdio>
+#include <cuda.h>
+
+// #include <cub/cub.cuh>
+
 
 
 //#define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
@@ -92,10 +97,18 @@ __global__ void forces(const double* rx,
         }
     }
 
-    fx[row] += fxi;
 
-    fy[row] += fyi;
-    fz[row] += fzi;
+    atomicAdd(&fx[row], fxi);
+    atomicAdd(&fy[row], fyi);
+    atomicAdd(&fz[row], fzi);
+
+    atomicAdd(&epot, epot_partial / 2);
+    atomicAdd(&pres, pres_vir_partial / 2 / (V * 3.0));
+
+    // fx[row] += fxi;
+
+    // fy[row] += fyi;
+    // fz[row] += fzi;
     *epot += epot_partial / 2;
     *pres += pres_vir_partial / 2 / (V * 3.0);
 
@@ -109,7 +122,7 @@ void launch_forces(const double* rx, const double* ry, const double* rz,
                    const double V, const double L)
 {
 
-    int block_size = N;
+    // int block_size = N;
     // int num_blocks = N;
 
     dim3 block(1);

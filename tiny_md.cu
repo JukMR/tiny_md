@@ -22,26 +22,26 @@ int main()
     double Rho, cell_V, cell_L, tail, Etail, Ptail;
     double *rx, *ry, *rz, *vx, *vy, *vz, *fx, *fy, *fz; // variables microscopicas
 
-    checkCudaCall(cudaMallocManaged(&rx, N * sizeof(double *)));
-    checkCudaCall(cudaMallocManaged(&ry, N * sizeof(double *)));
-    checkCudaCall(cudaMallocManaged(&rz, N * sizeof(double *)));
-    checkCudaCall(cudaMallocManaged(&vx, N * sizeof(double *)));
-    checkCudaCall(cudaMallocManaged(&vy, N * sizeof(double *)));
-    checkCudaCall(cudaMallocManaged(&vz, N * sizeof(double *)));
-    checkCudaCall(cudaMallocManaged(&fx, N * sizeof(double *)));
-    checkCudaCall(cudaMallocManaged(&fy, N * sizeof(double *)));
-    checkCudaCall(cudaMallocManaged(&fz, N * sizeof(double *)));
+    checkCudaError(cudaMallocManaged(&rx, N * sizeof(double *)));
+    checkCudaError(cudaMallocManaged(&ry, N * sizeof(double *)));
+    checkCudaError(cudaMallocManaged(&rz, N * sizeof(double *)));
+    checkCudaError(cudaMallocManaged(&vx, N * sizeof(double *)));
+    checkCudaError(cudaMallocManaged(&vy, N * sizeof(double *)));
+    checkCudaError(cudaMallocManaged(&vz, N * sizeof(double *)));
+    checkCudaError(cudaMallocManaged(&fx, N * sizeof(double *)));
+    checkCudaError(cudaMallocManaged(&fy, N * sizeof(double *)));
+    checkCudaError(cudaMallocManaged(&fz, N * sizeof(double *)));
 
 
-    checkCudaCall(cudaMemset(rx, 0, N * sizeof(double *)));
-    checkCudaCall(cudaMemset(ry, 0, N * sizeof(double *)));
-    checkCudaCall(cudaMemset(rz, 0, N * sizeof(double *)));
-    checkCudaCall(cudaMemset(vx, 0, N * sizeof(double *)));
-    checkCudaCall(cudaMemset(vy, 0, N * sizeof(double *)));
-    checkCudaCall(cudaMemset(vz, 0, N * sizeof(double *)));
-    checkCudaCall(cudaMemset(fx, 0, N * sizeof(double *)));
-    checkCudaCall(cudaMemset(fy, 0, N * sizeof(double *)));
-    checkCudaCall(cudaMemset(fz, 0, N * sizeof(double *)));
+    checkCudaError(cudaMemset(rx, 0, N * sizeof(double *)));
+    checkCudaError(cudaMemset(ry, 0, N * sizeof(double *)));
+    checkCudaError(cudaMemset(rz, 0, N * sizeof(double *)));
+    checkCudaError(cudaMemset(vx, 0, N * sizeof(double *)));
+    checkCudaError(cudaMemset(vy, 0, N * sizeof(double *)));
+    checkCudaError(cudaMemset(vz, 0, N * sizeof(double *)));
+    checkCudaError(cudaMemset(fx, 0, N * sizeof(double *)));
+    checkCudaError(cudaMemset(fy, 0, N * sizeof(double *)));
+    checkCudaError(cudaMemset(fz, 0, N * sizeof(double *)));
 
     // rx = (double*)malloc(N * sizeof(double));
     // ry = (double*)malloc(N * sizeof(double));
@@ -107,9 +107,9 @@ int main()
             double *ptr_Temp;
 
 
-            checkCudaCall(cudaMallocManaged(&epot_aux, sizeof(double *)));
-            checkCudaCall(cudaMallocManaged(&pres_aux, sizeof(double *)));
-            checkCudaCall(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
+            checkCudaError(cudaMallocManaged(&epot_aux, sizeof(double *)));
+            checkCudaError(cudaMallocManaged(&pres_aux, sizeof(double *)));
+            checkCudaError(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
 
             *epot_aux=0;
             *pres_aux=0;
@@ -124,9 +124,9 @@ int main()
              Epot+=*epot_aux;
              Pres+=*pres_aux;
 
-            checkCudaCall(cudaFree(epot_aux));
-            checkCudaCall(cudaFree(pres_aux));
-            checkCudaCall(cudaFree(ptr_Temp));
+            checkCudaError(cudaFree(epot_aux));
+            checkCudaError(cudaFree(pres_aux));
+            checkCudaError(cudaFree(ptr_Temp));
 
 
         for (i = 1; i < TEQ; i++) { // loop de equilibracion
@@ -193,15 +193,15 @@ int main()
     //                       ^1.6 fs -> ns       ^sec -> day
 
 
-    checkCudaCall(cudaFree(rx));
-    checkCudaCall(cudaFree(ry));
-    checkCudaCall(cudaFree(rz));
-    checkCudaCall(cudaFree(vx));
-    checkCudaCall(cudaFree(vy));
-    checkCudaCall(cudaFree(vz));
-    checkCudaCall(cudaFree(fx));
-    checkCudaCall(cudaFree(fy));
-    checkCudaCall(cudaFree(fz));
+    checkCudaError(cudaFree(rx));
+    checkCudaError(cudaFree(ry));
+    checkCudaError(cudaFree(rz));
+    checkCudaError(cudaFree(vx));
+    checkCudaError(cudaFree(vy));
+    checkCudaError(cudaFree(vz));
+    checkCudaError(cudaFree(fx));
+    checkCudaError(cudaFree(fy));
+    checkCudaError(cudaFree(fz));
 
     return 0;
 }

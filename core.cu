@@ -119,9 +119,9 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
             double *ptr_Temp;
 
 
-            checkCudaCall(cudaMallocManaged(&epot_aux, sizeof(double *)));
-            checkCudaCall(cudaMallocManaged(&pres_aux, sizeof(double *)));
-            checkCudaCall(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
+            checkCudaError(cudaMallocManaged(&epot_aux, sizeof(double *)));
+            checkCudaError(cudaMallocManaged(&pres_aux, sizeof(double *)));
+            checkCudaError(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
 
             *epot_aux=0;
             *pres_aux=0;
@@ -133,9 +133,9 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
         *epot += *epot_aux;
         *pres += *pres_aux;
 
-        checkCudaCall(cudaFree(epot_aux));
-        checkCudaCall(cudaFree(pres_aux));
-        checkCudaCall(cudaFree(ptr_Temp));
+        checkCudaError(cudaFree(epot_aux));
+        checkCudaError(cudaFree(pres_aux));
+        checkCudaError(cudaFree(ptr_Temp));
     }
 
 

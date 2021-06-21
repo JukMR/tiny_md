@@ -3,7 +3,7 @@
 // #include <cuda.h> // no se porque esto rompe todo
 
 #include <cuda_runtime.h>
-#include "helper_cuda.h" // checkCudaCall
+#include "helper_cuda.h" // checkCudaError
 #include "parameters.h"
 #include <cstdio>
 // #include <cuda.h>
@@ -44,6 +44,16 @@ __device__ void minimum_image(double cordi, const double cell_length, double* re
 // }
 
 
+__device__ double atomicAdd2(double* address, double val) {
+unsigned long long int* address_as_ull = (unsigned long long int*)address;
+unsigned long long int old = *address_as_ull, assumed;
+
+            do {
+                  assumed = old;
+                  old = atomicCAS(address_as_ull, assumed, __double_as_longlong(val+__longlong_as_double(assumed)));
+           } while (assumed != old);
+           return __longlong_as_double(old);
+}
 
 // Algo asi capaz si se podria implementar para la reduccion con doubles.
 
@@ -93,7 +103,10 @@ __global__ void forces(const double* rx,
     //        fz[row] = 0.0d;
 
     //    *epot = 0.0;
-    if (threadIdx.x == 0 ){
+
+
+
+    // if (threadIdx.x == 0 ){
     // printf("Soy el hilo %i", threadIdx.x); // esto funciona, solo el hilo 0 ejecuta esto
     double rcut2 = RCUT * RCUT;
     const double RCUT12 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT;
@@ -108,7 +121,11 @@ __global__ void forces(const double* rx,
     double epot_partial = 0.0;
     double pres_vir_partial = 0.0;
 
-    for (int j = 0; j < (N - 1); j++) {
+    // Solo ejecutar para contra los vecinos de la derecha.
+    // De todas formas no anda bien
+
+    // for (int j = 0; j < (N - 1); j++) {
+    for (int j = threadIdx.x; j < (N - 1); j++) {
         if (j != row) {
             double xi = rx[row];
             double yi = ry[row];
@@ -145,23 +162,28 @@ __global__ void forces(const double* rx,
         }
     }
 
-    // Estas funciones no parecen andar con doubles. Se podria investigar un poco más.
-    // atomicAdd(fx[row], fxi);
-    // atomicAdd(fy[row], fyi);
-    // atomicAdd(fz[row], fzi);
 
-    // atomicAdd(epot, epot_partial / 2);
-    // atomicAdd(pres, pres_vir_partial / 2 / (V * 3.0));
 
-    fx[row] += fxi;
 
-    fy[row] += fyi;
-    fz[row] += fzi;
-    *epot += epot_partial / 2;
-    *pres += pres_vir_partial / 2 / (V * 3.0);
+    // La implementacion de atomicAdd2 mas arriba parece funcionar pero los resultados siguen siendo incorrectos. No va por acá el error?
+
+    atomicAdd2(&fx[row], fxi);
+    atomicAdd2(&fy[row], fyi);
+    atomicAdd2(&fz[row], fzi);
+
+    atomicAdd2(epot, epot_partial / 2);
+    atomicAdd2(pres, pres_vir_partial / 2 / (V * 3.0));
+
+    // fx[row] += fxi;
+    // fy[row] += fyi;
+    // fz[row] += fzi;
+    // *epot += epot_partial / 2;
+    // *pres += pres_vir_partial / 2 / (V * 3.0);
+
 
 }
-}
+
+
 int div_ceil(int a, int b) {
     return (a + b - 1) / b;
 }
@@ -172,22 +194,23 @@ void launch_forces(const double* rx, const double* ry, const double* rz,
                    const double V, const double L)
 {
 
-    // Todavia no entiendo que numero de bloques y de grilla nos conviene usar para el problema
-
-    // int block_size = N;
-    // int num_blocks = N;
-
-    dim3 block(16);
-    dim3 grid(div_ceil(N, block.x));
+    // Todavía no entiendo que número de bloques y grilla nos conviene usar para el problema
 
 
-    // Este for probablemente no tendria que ir, deberiamos lanzar un kernel que haga esto segun el hilo en el que esta parado
+    // Por ahora tomo N-1 hilos para tener un hilo por cada elemento de N
+    dim3 block(N-1);
+
+    // Por ahora la misma selección de grilla usando los ejemplos de Charly
+    dim3 grid(div_ceil(N-1, block.x));
+
+
+    // Este for probablemente no tendria que ir, deberiamos lanzar un kernel que haga esto según el hilo en el que esta parado
     for(size_t i = 0; i < N-1; i++ ) {
     forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho,
                               V, L, i);
 
     }
-    checkCudaCall(cudaGetLastError());
-    checkCudaCall(cudaDeviceSynchronize());
+    checkCudaError(cudaGetLastError());
+    checkCudaError(cudaDeviceSynchronize());
 }
 

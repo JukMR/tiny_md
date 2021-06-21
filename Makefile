@@ -1,5 +1,5 @@
 CU=nvcc
-CUFLAGS=-O2 -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=$(particles)
+CUFLAGS=-O2 -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=$(particles) -arch=sm_75
 
 CC      = gcc-10
 CFLAGS  = -ffast-math -O3 -march=native $(particles)

@@ -9,12 +9,12 @@
 #include "helper_cuda.h"
 
 
-void init_pos(double* rx, double* ry, double* rz, const double rho)
+void init_pos(float* rx, float* ry, float* rz, const float rho)
 {
     // inicialización de las posiciones de los átomos en un cristal FCC
 
-    double a = cbrt(4.0 / rho); // cbrt=cube root
-    int nucells = ceil(cbrt((double)N / 4.0));
+    float a = cbrt(4.0 / rho); // cbrt=cube root
+    int nucells = ceil(cbrt((float)N / 4.0));
     int idx = 0;
 
     for (int i = 0; i < nucells; i++) {
@@ -43,24 +43,24 @@ void init_pos(double* rx, double* ry, double* rz, const double rho)
 }
 
 
-void init_vel(double* vx, double* vy, double* vz, double* temp, double* ekin)
+void init_vel(float* vx, float* vy, float* vz, float* temp, float* ekin)
 {
     // inicialización de velocidades aleatorias
 
-    double sf, sumvx = 0.0, sumvy = 0.0, sumvz = 0.0, sumv2 = 0.0;
+    float sf, sumvx = 0.0, sumvy = 0.0, sumvz = 0.0, sumv2 = 0.0;
     for (int i = 0; i < N; i++) {
-        vx[i] = rand() / (double)RAND_MAX - 0.5;
-        vy[i] = rand() / (double)RAND_MAX - 0.5;
-        vz[i] = rand() / (double)RAND_MAX - 0.5;
+        vx[i] = rand() / (float)RAND_MAX - 0.5;
+        vy[i] = rand() / (float)RAND_MAX - 0.5;
+        vz[i] = rand() / (float)RAND_MAX - 0.5;
         sumvx += vx[i];
         sumvy += vy[i];
         sumvz += vz[i];
         sumv2 += vx[i] * vx[i] + vy[i] * vy[i] + vz[i] * vz[i];
     }
 
-    sumvx /= (double)N;
-    sumvy /= (double)N;
-    sumvz /= (double)N;
+    sumvx /= (float)N;
+    sumvy /= (float)N;
+    sumvz /= (float)N;
     *temp = sumv2 / (3.0 * N);
     *ekin = 0.5 * sumv2;
     sf = sqrt(T0 / *temp);
@@ -73,7 +73,7 @@ void init_vel(double* vx, double* vy, double* vz, double* temp, double* ekin)
     }
 }
 
-static double pbc(double cordi, const double cell_length)
+static float pbc(float cordi, const float cell_length)
 {
     // condiciones periodicas de contorno coordenadas entre [0,L)
     if (cordi <= 0) {
@@ -85,11 +85,11 @@ static double pbc(double cordi, const double cell_length)
 }
 
 
-void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
-                     double* vy, double* vz, double* fx, double* fy,
-                     double* fz, double* epot, double* ekin, double* pres,
-                     double* temp, const double rho, const double V,
-                     const double L)
+void velocity_verlet(float* rx, float* ry, float* rz, float* vx,
+                     float* vy, float* vz, float* fx, float* fy,
+                     float* fz, float* epot, float* ekin, float* pres,
+                     float* temp, const float rho, const float V,
+                     const float L)
 {
 
     for (int i = 0; i < N; i++) { // actualizo posiciones
@@ -114,14 +114,14 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
     *epot = 0;
     *pres = *temp * rho;
     {
-            double *epot_aux;
-            double *pres_aux;
-            double *ptr_Temp;
+            float *epot_aux;
+            float *pres_aux;
+            float *ptr_Temp;
 
 
-            checkCudaError(cudaMallocManaged(&epot_aux, sizeof(double *)));
-            checkCudaError(cudaMallocManaged(&pres_aux, sizeof(double *)));
-            checkCudaError(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
+            checkCudaError(cudaMallocManaged(&epot_aux, sizeof(float *)));
+            checkCudaError(cudaMallocManaged(&pres_aux, sizeof(float *)));
+            checkCudaError(cudaMallocManaged(&ptr_Temp, sizeof(float *)));
 
             *epot_aux=0;
             *pres_aux=0;
@@ -139,7 +139,7 @@ void velocity_verlet(double* rx, double* ry, double* rz, double* vx,
     }
 
 
-    double sumv2 = 0.0;
+    float sumv2 = 0.0;
     for (int i = 0; i < N; i++) { // actualizo velocidades
         vx[i] += 0.5 * fx[i] * DT;
         vy[i] += 0.5 * fy[i] * DT;

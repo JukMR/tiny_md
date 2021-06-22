@@ -16,10 +16,10 @@
 #include "helper_cuda.h"
 
 // variables globales
-static double Ekin, Epot, Temp, Pres; // variables macroscopicas
-static double Rho, V, box_size, tail, Etail, Ptail;
-static double *rx, *ry, *rz, *vx, *vy, *vz, *fx, *fy, *fz; // variables microscopicas
-static double Rhob, sf, epotm, presm;
+static float Ekin, Epot, Temp, Pres; // variables macroscopicas
+static float Rho, V, box_size, tail, Etail, Ptail;
+static float *rx, *ry, *rz, *vx, *vy, *vz, *fx, *fy, *fz; // variables microscopicas
+static float Rhob, sf, epotm, presm;
 static int switcher = 0, frames = 0, mes;
 
 
@@ -52,14 +52,14 @@ static void post_display(void)
 
 static void draw_atoms(void)
 {
-    double glL = cbrt((double)N / (RHOI - 0.8));
+    float glL = cbrt((float)N / (RHOI - 0.8));
 
-    double resize = 0.5;
+    float resize = 0.5;
 
     // grafico las lineas que delimitan la caja de simulación
     glBegin(GL_LINES);
 
-    double box_line = resize * (box_size / glL);
+    float box_line = resize * (box_size / glL);
     glColor3d(0.0, 0.0, 1.0);
 
     glVertex3d(0.0, 0.0, 0.0);
@@ -107,9 +107,9 @@ static void draw_atoms(void)
 
     int di;
 
-    double dx;
-    double dy;
-    double dz;
+    float dx;
+    float dy;
+    float dz;
 
     for (di = 0; di < N; di++) {
         dx = (rx[di] / glL) * resize;
@@ -140,10 +140,10 @@ static void idle_func(void)
     if (switcher == 3) {
 
         Rho = RHOI;
-        V = (double)N / Rho;
+        V = (float)N / Rho;
         box_size = cbrt(V);
         tail = 16.0 * M_PI * Rho * ((2.0 / 3.0) * pow(RCUT, -9) - pow(RCUT, -3)) / 3.0;
-        Etail = tail * (double)N;
+        Etail = tail * (float)N;
         Ptail = tail * Rho;
 
         init_pos(rx, ry, rz, Rho);
@@ -158,14 +158,14 @@ static void idle_func(void)
         Pres = Temp * Rho;
         // #pragma omp parallel
         {
-            double *epot_aux;
-            double *pres_aux;
-            double *ptr_Temp;
+            float *epot_aux;
+            float *pres_aux;
+            float *ptr_Temp;
 
 
-            checkCudaError(cudaMallocManaged(&epot_aux, sizeof(double *)));
-            checkCudaError(cudaMallocManaged(&pres_aux, sizeof(double *)));
-            checkCudaError(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
+            checkCudaError(cudaMallocManaged(&epot_aux, sizeof(float *)));
+            checkCudaError(cudaMallocManaged(&pres_aux, sizeof(float *)));
+            checkCudaError(cudaMallocManaged(&ptr_Temp, sizeof(float *)));
 
             *epot_aux=0;
             *pres_aux=0;
@@ -186,16 +186,16 @@ static void idle_func(void)
 
     } else if (switcher == 2) { // imprimo propiedades en la terminal y cambio la densidad
 
-        printf("%f\t%f\t%f\t%f\n", Rho, V, epotm / (double)mes,
-               presm / (double)mes);
+        printf("%f\t%f\t%f\t%f\n", Rho, V, epotm / (float)mes,
+               presm / (float)mes);
 
         Rhob = Rho;
         Rho = Rho - 0.1;
 
-        V = (double)N / Rho;
+        V = (float)N / Rho;
         box_size = cbrt(V);
         tail = 16.0 * M_PI * Rho * ((2.0 / 3.0) * pow(RCUT, -9) - pow(RCUT, -3)) / 3.0;
-        Etail = tail * (double)N;
+        Etail = tail * (float)N;
         Ptail = tail * Rho;
 
         sf = cbrt(Rhob / Rho);
@@ -215,14 +215,14 @@ static void idle_func(void)
         Pres = Temp * Rho;
         // #pragma omp parallel
         {
-            double *epot_aux;
-            double *pres_aux;
-            double *ptr_Temp;
+            float *epot_aux;
+            float *pres_aux;
+            float *ptr_Temp;
 
 
-            checkCudaError(cudaMallocManaged(&epot_aux, sizeof(double *)));
-            checkCudaError(cudaMallocManaged(&pres_aux, sizeof(double *)));
-            checkCudaError(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
+            checkCudaError(cudaMallocManaged(&epot_aux, sizeof(float *)));
+            checkCudaError(cudaMallocManaged(&pres_aux, sizeof(float *)));
+            checkCudaError(cudaMallocManaged(&ptr_Temp, sizeof(float *)));
 
             *epot_aux=0;
             *pres_aux=0;
@@ -342,36 +342,36 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
 
-    // rx = (double*)malloc(N * sizeof(double));
-    // ry = (double*)malloc(N * sizeof(double));
-    // rz = (double*)malloc(N * sizeof(double));
-    // vx = (double*)malloc(N * sizeof(double));
-    // vy = (double*)malloc(N * sizeof(double));
-    // vz = (double*)malloc(N * sizeof(double));
-    // fx = (double*)malloc(N * sizeof(double));
-    // fy = (double*)malloc(N * sizeof(double));
-    // fz = (double*)malloc(N * sizeof(double));
+    // rx = (float*)malloc(N * sizeof(float));
+    // ry = (float*)malloc(N * sizeof(float));
+    // rz = (float*)malloc(N * sizeof(float));
+    // vx = (float*)malloc(N * sizeof(float));
+    // vy = (float*)malloc(N * sizeof(float));
+    // vz = (float*)malloc(N * sizeof(float));
+    // fx = (float*)malloc(N * sizeof(float));
+    // fy = (float*)malloc(N * sizeof(float));
+    // fz = (float*)malloc(N * sizeof(float));
 
-    checkCudaError(cudaMallocManaged(&rx, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&ry, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&rz, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&vx, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&vy, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&vz, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&fx, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&fy, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&fz, N * sizeof(double *)));
+    checkCudaError(cudaMallocManaged(&rx, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&ry, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&rz, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&vx, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&vy, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&vz, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&fx, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&fy, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&fz, N * sizeof(float *)));
 
 
-    checkCudaError(cudaMemset(rx, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(ry, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(rz, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(vx, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(vy, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(vz, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(fx, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(fy, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(fz, 0, N * sizeof(double *)));
+    checkCudaError(cudaMemset(rx, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(ry, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(rz, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(vx, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(vy, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(vz, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(fx, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(fy, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(fz, 0, N * sizeof(float *)));
 
 
     // parametros iniciales para que los pueda usar (antes de modificar)
@@ -379,10 +379,10 @@ int main(int argc, char** argv)
     srand(SEED);
     Rho = RHOI;
     Rhob = Rho;
-    V = (double)N / Rho;
+    V = (float)N / Rho;
     box_size = cbrt(V);
     tail = 16.0 * M_PI * Rho * ((2.0 / 3.0) * pow(RCUT, -9) - pow(RCUT, -3)) / 3.0;
-    Etail = tail * (double)N;
+    Etail = tail * (float)N;
     Ptail = tail * Rho;
 
     init_pos(rx, ry, rz, Rho);
@@ -397,14 +397,14 @@ int main(int argc, char** argv)
     Pres = Temp * Rho;
     // #pragma omp parallel
         {
-            double *epot_aux;
-            double *pres_aux;
-            double *ptr_Temp;
+            float *epot_aux;
+            float *pres_aux;
+            float *ptr_Temp;
 
 
-            checkCudaError(cudaMallocManaged(&epot_aux, sizeof(double *)));
-            checkCudaError(cudaMallocManaged(&pres_aux, sizeof(double *)));
-            checkCudaError(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
+            checkCudaError(cudaMallocManaged(&epot_aux, sizeof(float *)));
+            checkCudaError(cudaMallocManaged(&pres_aux, sizeof(float *)));
+            checkCudaError(cudaMallocManaged(&ptr_Temp, sizeof(float *)));
 
             *epot_aux=0;
             *pres_aux=0;

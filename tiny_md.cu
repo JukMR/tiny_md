@@ -18,44 +18,44 @@ int main()
     FILE *file_xyz, *file_thermo;
     file_xyz = fopen("trajectory.xyz", "w");
     file_thermo = fopen("thermo.log", "w");
-    double Ekin, Epot, Temp, Pres; // variables macroscopicas
-    double Rho, cell_V, cell_L, tail, Etail, Ptail;
-    double *rx, *ry, *rz, *vx, *vy, *vz, *fx, *fy, *fz; // variables microscopicas
+    float Ekin, Epot, Temp, Pres; // variables macroscopicas
+    float Rho, cell_V, cell_L, tail, Etail, Ptail;
+    float *rx, *ry, *rz, *vx, *vy, *vz, *fx, *fy, *fz; // variables microscopicas
 
-    checkCudaError(cudaMallocManaged(&rx, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&ry, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&rz, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&vx, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&vy, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&vz, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&fx, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&fy, N * sizeof(double *)));
-    checkCudaError(cudaMallocManaged(&fz, N * sizeof(double *)));
+    checkCudaError(cudaMallocManaged(&rx, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&ry, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&rz, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&vx, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&vy, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&vz, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&fx, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&fy, N * sizeof(float *)));
+    checkCudaError(cudaMallocManaged(&fz, N * sizeof(float *)));
 
 
-    checkCudaError(cudaMemset(rx, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(ry, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(rz, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(vx, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(vy, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(vz, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(fx, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(fy, 0, N * sizeof(double *)));
-    checkCudaError(cudaMemset(fz, 0, N * sizeof(double *)));
+    checkCudaError(cudaMemset(rx, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(ry, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(rz, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(vx, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(vy, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(vz, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(fx, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(fy, 0, N * sizeof(float *)));
+    checkCudaError(cudaMemset(fz, 0, N * sizeof(float *)));
 
-    // rx = (double*)malloc(N * sizeof(double));
-    // ry = (double*)malloc(N * sizeof(double));
-    // rz = (double*)malloc(N * sizeof(double));
-    // vx = (double*)malloc(N * sizeof(double));
-    // vy = (double*)malloc(N * sizeof(double));
-    // vz = (double*)malloc(N * sizeof(double));
-    // fx = (double*)malloc(N * sizeof(double));
-    // fy = (double*)malloc(N * sizeof(double));
-    // fz = (double*)malloc(N * sizeof(double));
+    // rx = (float*)malloc(N * sizeof(float));
+    // ry = (float*)malloc(N * sizeof(float));
+    // rz = (float*)malloc(N * sizeof(float));
+    // vx = (float*)malloc(N * sizeof(float));
+    // vy = (float*)malloc(N * sizeof(float));
+    // vz = (float*)malloc(N * sizeof(float));
+    // fx = (float*)malloc(N * sizeof(float));
+    // fy = (float*)malloc(N * sizeof(float));
+    // fz = (float*)malloc(N * sizeof(float));
 
-    //    rxyz = (double*)malloc(3 * N * sizeof(double));
-    //    vxyz = (double*)malloc(3 * N * sizeof(double));
-    //    fxyz = (double*)malloc(3 * N * sizeof(double));
+    //    rxyz = (float*)malloc(3 * N * sizeof(float));
+    //    vxyz = (float*)malloc(3 * N * sizeof(float));
+    //    fxyz = (float*)malloc(3 * N * sizeof(float));
 
     printf("# Número de partículas:      %d\n", N);
     printf("# Temperatura de referencia: %.2f\n", T0);
@@ -66,20 +66,20 @@ int main()
     fprintf(file_thermo, "# t Temp Pres Epot Etot\n");
 
     srand(SEED);
-    double t = 0.0, sf;
-    double Rhob;
+    float t = 0.0, sf;
+    float Rhob;
     Rho = RHOI;
     init_pos(rx, ry, rz, Rho);
-    double start = wtime();
+    float start = wtime();
 
-    // double ecut = (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)));
+    // float ecut = (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)));
     for (int m = 0; m < 9; m++) {
         Rhob = Rho;
-        Rho = RHOI - 0.1 * (double)m;
-        cell_V = (double)N / Rho;
+        Rho = RHOI - 0.1 * (float)m;
+        cell_V = (float)N / Rho;
         cell_L = cbrt(cell_V);
         tail = 16.0 * M_PI * Rho * ((2.0 / 3.0) * pow(RCUT, -9) - pow(RCUT, -3)) / 3.0;
-        Etail = tail * (double)N;
+        Etail = tail * (float)N;
         Ptail = tail * Rho;
 
         int i = 0;
@@ -102,14 +102,14 @@ int main()
             Pres=Temp* Rho ;
 
 
-            double *epot_aux;
-            double *pres_aux;
-            double *ptr_Temp;
+            float *epot_aux;
+            float *pres_aux;
+            float *ptr_Temp;
 
 
-            checkCudaError(cudaMallocManaged(&epot_aux, sizeof(double *)));
-            checkCudaError(cudaMallocManaged(&pres_aux, sizeof(double *)));
-            checkCudaError(cudaMallocManaged(&ptr_Temp, sizeof(double *)));
+            checkCudaError(cudaMallocManaged(&epot_aux, sizeof(float *)));
+            checkCudaError(cudaMallocManaged(&pres_aux, sizeof(float *)));
+            checkCudaError(cudaMallocManaged(&ptr_Temp, sizeof(float *)));
 
             *epot_aux=0;
             *pres_aux=0;
@@ -142,7 +142,7 @@ int main()
         }
 
         int mes = 0;
-        double epotm = 0.0, presm = 0.0;
+        float epotm = 0.0, presm = 0.0;
         for (i = TEQ; i < TRUN; i++) { // loop de medicion
 
             velocity_verlet(rx, ry, rz, vx, vy, vz, fx, fy, fz, &Epot, &Ekin, &Pres, &Temp, Rho, cell_V, cell_L);
@@ -171,10 +171,10 @@ int main()
 
             t += DT;
         }
-        printf("%f\t%f\t%f\t%f\n", Rho, cell_V, epotm / (double)mes, presm / (double)mes);
+        printf("%f\t%f\t%f\t%f\n", Rho, cell_V, epotm / (float)mes, presm / (float)mes);
     }
 
-    double elapsed = wtime() - start;
+    float elapsed = wtime() - start;
     FILE* logs;
     logs = fopen("statics.res", "a");
     if (logs == NULL) {
@@ -183,9 +183,9 @@ int main()
     }
 
     fprintf(logs, "# Tiempo total de simulación = %f segundos\n", elapsed);
-    double foperations = (N * (N - 1) * 0.5 * 41.0 + 5.0) * TRUN;
+    float foperations = (N * (N - 1) * 0.5 * 41.0 + 5.0) * TRUN;
     fprintf(logs, "%s %f \n", "Floating point operation done:", foperations);
-    double flops = foperations / elapsed;
+    float flops = foperations / elapsed;
     fprintf(logs, "%s %f\n", "FLOPS:", flops);
     fprintf(logs, "%s %f\n", "GFLOPS:", flops / (1000.0 * 1000.0 * 1000.0));
     fprintf(logs, "# Tiempo simulado = %f [fs]\n", t * 1.6);

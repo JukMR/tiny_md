@@ -5,7 +5,7 @@
 // #endif
 
 
-double wtime(void);
+float wtime(void);
 
 // #ifdef __cplusplus
 // }

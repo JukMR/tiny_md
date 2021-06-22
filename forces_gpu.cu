@@ -14,7 +14,7 @@
 
 //#define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
 
-__device__ void minimum_image(double cordi, const double cell_length, double* result)
+__device__ void minimum_image(float cordi, const float cell_length, float* result)
 {
     // imagen más cercana
     if (cordi <= -0.5 * cell_length) {
@@ -55,7 +55,7 @@ unsigned long long int old = *address_as_ull, assumed;
            return __longlong_as_double(old);
 }
 
-// Algo asi capaz si se podria implementar para la reduccion con doubles.
+// Algo asi capaz si se podria implementar para la reduccion con floats.
 
 
 // __global__ void sum_shared_atomic(const int *in, int n, int *out)
@@ -83,18 +83,18 @@ unsigned long long int old = *address_as_ull, assumed;
 
 
 
-__global__ void forces(const double* rx,
-                       const double* ry,
-                       const double* rz,
-                       double* fx,
-                       double* fy,
-                       double* fz,
-                       double* epot,
-                       double* pres,
-                       const double* temp,
-                       const double rho,
-                       const double V,
-                       const double L,
+__global__ void forces(const float* rx,
+                       const float* ry,
+                       const float* rz,
+                       float* fx,
+                       float* fy,
+                       float* fz,
+                       float* epot,
+                       float* pres,
+                       const float* temp,
+                       const float rho,
+                       const float V,
+                       const float L,
                        const int row)
 {
 
@@ -108,18 +108,18 @@ __global__ void forces(const double* rx,
 
     // if (threadIdx.x == 0 ){
     // printf("Soy el hilo %i", threadIdx.x); // esto funciona, solo el hilo 0 ejecuta esto
-    double rcut2 = RCUT * RCUT;
-    const double RCUT12 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT;
+    float rcut2 = RCUT * RCUT;
+    const float RCUT12 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT;
 
-    const double RCUT6 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT;
-    const double ECUT = 4.0 * (1 / (RCUT12)-1 / (RCUT6));
+    const float RCUT6 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT;
+    const float ECUT = 4.0 * (1 / (RCUT12)-1 / (RCUT6));
     // //#define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
 
-    double fxi = 0.0;
-    double fyi = 0.0;
-    double fzi = 0.0;
-    double epot_partial = 0.0;
-    double pres_vir_partial = 0.0;
+    float fxi = 0.0;
+    float fyi = 0.0;
+    float fzi = 0.0;
+    float epot_partial = 0.0;
+    float pres_vir_partial = 0.0;
 
     // Solo ejecutar para contra los vecinos de la derecha.
     // De todas formas no anda bien
@@ -127,29 +127,29 @@ __global__ void forces(const double* rx,
     // for (int j = 0; j < (N - 1); j++) {
     for (int j = threadIdx.x; j < (N - 1); j++) {
         if (j != row) {
-            double xi = rx[row];
-            double yi = ry[row];
-            double zi = rz[row];
+            float xi = rx[row];
+            float yi = ry[row];
+            float zi = rz[row];
 
-            double xj = rx[j];
-            double yj = ry[j];
-            double zj = rz[j];
+            float xj = rx[j];
+            float yj = ry[j];
+            float zj = rz[j];
 
-            double rxd = xi - xj;
-            double ryd = yi - yj;
-            double rzd = zi - zj;
+            float rxd = xi - xj;
+            float ryd = yi - yj;
+            float rzd = zi - zj;
 
             minimum_image(rxd, L, &rxd);
             minimum_image(ryd, L, &ryd);
             minimum_image(rzd, L, &rzd);
 
-            double rij2 = rxd * rxd + ryd * ryd + rzd * rzd;
+            float rij2 = rxd * rxd + ryd * ryd + rzd * rzd;
 
             if (rij2 <= rcut2) {
-                double r2inv = 1.0 / rij2;
-                double r6inv = r2inv * r2inv * r2inv;
+                float r2inv = 1.0 / rij2;
+                float r6inv = r2inv * r2inv * r2inv;
 
-                double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0);
+                float fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0);
 
                 fxi += fr * rxd;
                 fyi += fr * ryd;
@@ -167,12 +167,12 @@ __global__ void forces(const double* rx,
 
     // La implementacion de atomicAdd2 mas arriba parece funcionar pero los resultados siguen siendo incorrectos. No va por acá el error?
 
-    atomicAdd2(&fx[row], fxi);
-    atomicAdd2(&fy[row], fyi);
-    atomicAdd2(&fz[row], fzi);
+    atomicAdd(&fx[row], fxi);
+    atomicAdd(&fy[row], fyi);
+    atomicAdd(&fz[row], fzi);
 
-    atomicAdd2(epot, epot_partial / 2);
-    atomicAdd2(pres, pres_vir_partial / 2 / (V * 3.0));
+    atomicAdd(epot, epot_partial / 2);
+    atomicAdd(pres, pres_vir_partial / 2 / (V * 3.0));
 
     // fx[row] += fxi;
     // fy[row] += fyi;
@@ -188,10 +188,10 @@ int div_ceil(int a, int b) {
     return (a + b - 1) / b;
 }
 
-void launch_forces(const double* rx, const double* ry, const double* rz,
-                   double* fx, double* fy, double* fz, double* epot,
-                   double* pres, const double* temp, const double rho,
-                   const double V, const double L)
+void launch_forces(const float* rx, const float* ry, const float* rz,
+                   float* fx, float* fy, float* fz, float* epot,
+                   float* pres, const float* temp, const float rho,
+                   const float V, const float L)
 {
 
     // Todavía no entiendo que número de bloques y grilla nos conviene usar para el problema
@@ -206,7 +206,7 @@ void launch_forces(const double* rx, const double* ry, const double* rz,
 
     // Este for probablemente no tendria que ir, deberiamos lanzar un kernel que haga esto según el hilo en el que esta parado
     for(size_t i = 0; i < N-1; i++ ) {
-    forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho,
+    forces <<<1, 1>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho,
                               V, L, i);
 
     }

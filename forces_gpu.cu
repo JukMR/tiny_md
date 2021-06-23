@@ -125,7 +125,11 @@ __global__ void forces(const double* rx,
     // De todas formas no anda bien
 
     // for (int j = 0; j < (N - 1); j++) {
-    for (int j = threadIdx.x; j < (N - 1); j++) {
+    // for (int j = threadIdx.x; j < (N - 1); j++) {
+
+
+    unsigned int j = blockIdx.x * blockDim.x + threadIdx.x;
+
         if (j != row) {
             double xi = rx[row];
             double yi = ry[row];
@@ -158,7 +162,7 @@ __global__ void forces(const double* rx,
 
                 epot_partial += 4.0 * r6inv * (r6inv - 1.0) - ECUT;
                 pres_vir_partial += fr * rij2;
-            }
+            // }
         }
     }
 
@@ -182,7 +186,7 @@ __global__ void forces(const double* rx,
 
 
 }
-
+// }
 
 int div_ceil(int a, int b) {
     return (a + b - 1) / b;

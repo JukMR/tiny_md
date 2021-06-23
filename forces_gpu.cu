@@ -121,11 +121,16 @@ __global__ void forces(const float* rx,
     float epot_partial = 0.0;
     float pres_vir_partial = 0.0;
 
+	unsigned int j = blockIdx.x*blockDim.x + threadIdx.x;
+	// unsigned int j =  threadIdx.x;
+
+
+
     // Solo ejecutar para contra los vecinos de la derecha.
     // De todas formas no anda bien
 
     // for (int j = 0; j < (N - 1); j++) {
-    for (int j = threadIdx.x; j < (N - 1); j++) {
+    for (; j < (N - 1); j++) {
         if (j != row) {
             float xi = rx[row];
             float yi = ry[row];
@@ -205,12 +210,28 @@ void launch_forces(const float* rx, const float* ry, const float* rz,
 
 
     // Este for probablemente no tendria que ir, deberiamos lanzar un kernel que haga esto según el hilo en el que esta parado
+
+    float *epot_tmp;
+    float *pres_tmp;
+
+    checkCudaError(cudaMallocManaged(&epot_tmp, sizeof( float *)));
+    checkCudaError(cudaMallocManaged(&pres_tmp, sizeof( float *)));
+
     for(size_t i = 0; i < N-1; i++ ) {
-    forces <<<1, 1>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho,
-                              V, L, i);
+
+    *epot_tmp = *epot;
+    *pres_tmp = *pres;
+
+    forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot_tmp, pres_tmp, temp, rho, V, L, i);
+
+    *epot = *epot_tmp;
+    *pres = *pres_tmp;
 
     }
     checkCudaError(cudaGetLastError());
     checkCudaError(cudaDeviceSynchronize());
+
+    checkCudaError(cudaFree(epot_tmp));
+    checkCudaError(cudaFree(pres_tmp));
 }
 

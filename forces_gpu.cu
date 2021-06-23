@@ -106,7 +106,6 @@ __global__ void forces(const float* rx,
 
 
 
-    // if (threadIdx.x == 0 ){
     // printf("Soy el hilo %i", threadIdx.x); // esto funciona, solo el hilo 0 ejecuta esto
     float rcut2 = RCUT * RCUT;
     const float RCUT12 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT;
@@ -130,7 +129,6 @@ __global__ void forces(const float* rx,
     // De todas formas no anda bien
 
     // for (int j = 0; j < (N - 1); j++) {
-    for (; j < (N - 1); j++) {
         if (j != row) {
             float xi = rx[row];
             float yi = ry[row];
@@ -165,7 +163,6 @@ __global__ void forces(const float* rx,
                 pres_vir_partial += fr * rij2;
             }
         }
-    }
 
 
 
@@ -187,7 +184,6 @@ __global__ void forces(const float* rx,
 
 
 }
-
 
 int div_ceil(int a, int b) {
     return (a + b - 1) / b;
@@ -219,13 +215,13 @@ void launch_forces(const float* rx, const float* ry, const float* rz,
 
     for(size_t i = 0; i < N-1; i++ ) {
 
-    *epot_tmp = *epot;
-    *pres_tmp = *pres;
+    // *epot_tmp = *epot;
+    // *pres_tmp = *pres;
 
-    forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot_tmp, pres_tmp, temp, rho, V, L, i);
+    forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L, i);
 
-    *epot = *epot_tmp;
-    *pres = *pres_tmp;
+    // *epot = *epot_tmp;
+    // *pres = *pres_tmp;
 
     }
     checkCudaError(cudaGetLastError());

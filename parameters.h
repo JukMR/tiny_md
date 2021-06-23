@@ -16,7 +16,9 @@
 #endif
 
 #ifndef SEED // rand SEED para las velocidades
-#define SEED (time(NULL))
+// #define SEED (time(NULL))
+#define SEED 0
+
 #endif
 
 #ifndef T0 // isoterma

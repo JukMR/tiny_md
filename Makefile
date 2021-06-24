@@ -10,7 +10,7 @@ SOURCES	= $(shell echo *.cu)
 OBJECTS = core.o wtime.o forces_gpu.o
 
 particles = -DN=$(N)
-N = 256
+N = 1375
 
 all: $(TARGETS)
 

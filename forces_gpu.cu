@@ -123,8 +123,8 @@ __global__ void forces(const double* rx,
 
 
    // unsigned int j =  threadIdx.x;
-    unsigned int row =  blockIdx.x;
-    for(int j=0; j<N;j++){
+    size_t row =  (blockIdx.x * blockDim.x+threadIdx.x) ;
+    for(int j=0; j<N && row<=N;j++){
 
         if (j != row) {
             double xi = rx[row];
@@ -201,12 +201,12 @@ void launch_forces(const double* rx, const double* ry, const double* rz,
 
     // Por ahora tomo N-1 hilos para tener un hilo por cada elemento de N
     //dim3 block(N-1);
-    dim3 block(1);
+    dim3 block(128);
 
 
     // Por ahora la misma selección de grilla usando los ejemplos de Charly
-    dim3 grid(N);
-
+    //dim3 grid(N+1);
+    dim3 grid(div_ceil(N, block.x));
 
     // Este for probablemente no tendria que ir, deberiamos lanzar un kernel que haga esto según el hilo en el que esta parado
     // for(size_t i = 0; i < N-1; i++ ) {

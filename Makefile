@@ -1,5 +1,5 @@
 CU=nvcc
-CUFLAGS=-O2 -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=$(particles) -arch=sm_75
+CUFLAGS=-O2 -Xcompiler=-Wall -Xcompiler=-Wextra -Xcompiler=$(particles)  -arch=sm_75 -Xcompiler=-DBLOCK_SIZE=$(BLOCK_SIZE)
 
 CC      = gcc-10
 CFLAGS  = -ffast-math -O3 -march=native $(particles)
@@ -11,6 +11,7 @@ OBJECTS = core.o wtime.o forces_gpu.o
 
 particles = -DN=$(N)
 N = 32
+BLOCK_SIZE=32
 
 all: $(TARGETS)
 

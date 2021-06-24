@@ -12,6 +12,9 @@
 
 # define CUDA_WARP_SIZE 32
 
+#ifndef BLOCK_SIZE
+# define BLOCK_SIZE 32
+#endif
 
 __device__ void minimum_image(double cordi, const double cell_length, double* result)
 {
@@ -56,7 +59,7 @@ __global__ void forces(const double* rx,
 
     unsigned int j =  threadIdx.x;
     unsigned int row =  blockIdx.x;
-    for(; j < N ;j+= CUDA_WARP_SIZE){
+    for(; j < N ;j+= BLOCK_SIZE){
 
         if (j != row) {
             double xi = rx[row];
@@ -119,7 +122,7 @@ void launch_forces(const double* rx, const double* ry, const double* rz,
                    const double V, const double L)
 {
 
-    dim3 block(CUDA_WARP_SIZE);
+    dim3 block(BLOCK_SIZE);
 
     dim3 grid(N);
 

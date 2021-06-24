@@ -94,10 +94,11 @@ __global__ void forces(const double* rx,
                        const double* temp,
                        const double rho,
                        const double V,
-                       const double L,
-                       const int row)
+                       const double L
+                       )
 {
 
+    for (size_t row = 0; row < N-1 ; row ++) {
     //        fx[row] = 0.0d;
     //        fy[row] = 0.0d;
     //        fz[row] = 0.0d;
@@ -106,8 +107,6 @@ __global__ void forces(const double* rx,
 
 
 
-    // if (threadIdx.x == 0 ){
-    // printf("Soy el hilo %i", threadIdx.x); // esto funciona, solo el hilo 0 ejecuta esto
     double rcut2 = RCUT * RCUT;
     const double RCUT12 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT;
 
@@ -120,12 +119,6 @@ __global__ void forces(const double* rx,
     double fzi = 0.0;
     double epot_partial = 0.0;
     double pres_vir_partial = 0.0;
-
-    // Solo ejecutar para contra los vecinos de la derecha.
-    // De todas formas no anda bien
-
-    // for (int j = 0; j < (N - 1); j++) {
-    // for (int j = threadIdx.x; j < (N - 1); j++) {
 
 
     unsigned int j = blockIdx.x * blockDim.x + threadIdx.x;
@@ -171,12 +164,12 @@ __global__ void forces(const double* rx,
 
     // La implementacion de atomicAdd2 mas arriba parece funcionar pero los resultados siguen siendo incorrectos. No va por acá el error?
 
-    atomicAdd2(&fx[row], fxi);
-    atomicAdd2(&fy[row], fyi);
-    atomicAdd2(&fz[row], fzi);
+    atomicAdd(&fx[row], fxi);
+    atomicAdd(&fy[row], fyi);
+    atomicAdd(&fz[row], fzi);
 
-    atomicAdd2(epot, epot_partial / 2);
-    atomicAdd2(pres, pres_vir_partial / 2 / (V * 3.0));
+    atomicAdd(epot, epot_partial / 2);
+    atomicAdd(pres, pres_vir_partial / 2 / (V * 3.0));
 
     // fx[row] += fxi;
     // fy[row] += fyi;
@@ -188,6 +181,7 @@ __global__ void forces(const double* rx,
 }
 // }
 
+}
 int div_ceil(int a, int b) {
     return (a + b - 1) / b;
 }
@@ -209,11 +203,11 @@ void launch_forces(const double* rx, const double* ry, const double* rz,
 
 
     // Este for probablemente no tendria que ir, deberiamos lanzar un kernel que haga esto según el hilo en el que esta parado
-    for(size_t i = 0; i < N-1; i++ ) {
+    // for(size_t i = 0; i < N-1; i++ ) {
     forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho,
-                              V, L, i);
+                              V, L);
 
-    }
+    // }
     checkCudaError(cudaGetLastError());
     checkCudaError(cudaDeviceSynchronize());
 }

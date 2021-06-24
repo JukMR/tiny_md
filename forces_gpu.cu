@@ -94,19 +94,11 @@ __global__ void forces(const float* rx,
                        const float* temp,
                        const float rho,
                        const float V,
-                       const float L,
-                       const int row)
+                       const float L)
 {
 
-    //        fx[row] = 0.0d;
-    //        fy[row] = 0.0d;
-    //        fz[row] = 0.0d;
+    for (uint row = 0; row < N-1; row++){
 
-    //    *epot = 0.0;
-
-
-
-    // printf("Soy el hilo %i", threadIdx.x); // esto funciona, solo el hilo 0 ejecuta esto
     float rcut2 = RCUT * RCUT;
     const float RCUT12 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT;
 
@@ -121,14 +113,7 @@ __global__ void forces(const float* rx,
     float pres_vir_partial = 0.0;
 
 	unsigned int j = blockIdx.x*blockDim.x + threadIdx.x;
-	// unsigned int j =  threadIdx.x;
 
-
-
-    // Solo ejecutar para contra los vecinos de la derecha.
-    // De todas formas no anda bien
-
-    // for (int j = 0; j < (N - 1); j++) {
         if (j != row) {
             float xi = rx[row];
             float yi = ry[row];
@@ -165,10 +150,6 @@ __global__ void forces(const float* rx,
         }
 
 
-
-
-    // La implementacion de atomicAdd2 mas arriba parece funcionar pero los resultados siguen siendo incorrectos. No va por acá el error?
-
     atomicAdd(&fx[row], fxi);
     atomicAdd(&fy[row], fyi);
     atomicAdd(&fz[row], fzi);
@@ -183,8 +164,8 @@ __global__ void forces(const float* rx,
     // *pres += pres_vir_partial / 2 / (V * 3.0);
 
 
+    }
 }
-
 int div_ceil(int a, int b) {
     return (a + b - 1) / b;
 }
@@ -207,27 +188,13 @@ void launch_forces(const float* rx, const float* ry, const float* rz,
 
     // Este for probablemente no tendria que ir, deberiamos lanzar un kernel que haga esto según el hilo en el que esta parado
 
-    float *epot_tmp;
-    float *pres_tmp;
 
-    checkCudaError(cudaMallocManaged(&epot_tmp, sizeof( float *)));
-    checkCudaError(cudaMallocManaged(&pres_tmp, sizeof( float *)));
 
-    for(size_t i = 0; i < N-1; i++ ) {
+    forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L);
 
-    // *epot_tmp = *epot;
-    // *pres_tmp = *pres;
 
-    forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L, i);
-
-    // *epot = *epot_tmp;
-    // *pres = *pres_tmp;
-
-    }
     checkCudaError(cudaGetLastError());
     checkCudaError(cudaDeviceSynchronize());
 
-    checkCudaError(cudaFree(epot_tmp));
-    checkCudaError(cudaFree(pres_tmp));
 }
 

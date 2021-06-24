@@ -98,7 +98,6 @@ __global__ void forces(const double* rx,
                        )
 {
 
-    for (size_t row = 0; row < N-1 ; row ++) {
     //        fx[row] = 0.0d;
     //        fy[row] = 0.0d;
     //        fz[row] = 0.0d;
@@ -121,7 +120,9 @@ __global__ void forces(const double* rx,
     double pres_vir_partial = 0.0;
 
 
-    unsigned int j = blockIdx.x * blockDim.x + threadIdx.x;
+    unsigned int j =  threadIdx.x;
+    unsigned int row =  blockIdx.x;
+
 
         if (j != row) {
             double xi = rx[row];
@@ -178,7 +179,6 @@ __global__ void forces(const double* rx,
     // *pres += pres_vir_partial / 2 / (V * 3.0);
 
 
-}
 // }
 
 }
@@ -199,7 +199,7 @@ void launch_forces(const double* rx, const double* ry, const double* rz,
     dim3 block(N-1);
 
     // Por ahora la misma selección de grilla usando los ejemplos de Charly
-    dim3 grid(div_ceil(N-1, block.x));
+    dim3 grid(N-1);
 
 
     // Este for probablemente no tendria que ir, deberiamos lanzar un kernel que haga esto según el hilo en el que esta parado

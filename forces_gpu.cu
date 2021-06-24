@@ -10,6 +10,8 @@
 
 // #include <cub/cub.cuh>
 
+# define CUDA_WARP_SIZE 32
+
 
 __device__ void minimum_image(float cordi, const float cell_length, float* result)
 {
@@ -54,7 +56,7 @@ __global__ void forces(const float* rx,
 
     unsigned int j =  threadIdx.x;
     unsigned int row =  blockIdx.x;
-
+    for(; j < N ;j+= CUDA_WARP_SIZE){
 
         if (j != row) {
             float xi = rx[row];
@@ -88,21 +90,28 @@ __global__ void forces(const float* rx,
 
                 epot_partial += 4.0 * r6inv * (r6inv - 1.0) - ECUT;
                 pres_vir_partial += fr * rij2;
+            }
         }
     }
 
+    // fx[row]+=fxi;
+    // fy[row]+=fyi;
+    // fz[row]+=fzi;
     atomicAdd(&fx[row], fxi);
     atomicAdd(&fy[row], fyi);
     atomicAdd(&fz[row], fzi);
 
     atomicAdd(epot, epot_partial / 2);
     atomicAdd(pres, pres_vir_partial / 2 / (V * 3.0));
+
 }
 
 
-int div_ceil(int a, int b) {
+int div_ceil(int a, int b)
+{
     return (a + b - 1) / b;
 }
+
 
 void launch_forces(const float* rx, const float* ry, const float* rz,
                    float* fx, float* fy, float* fz, float* epot,
@@ -110,14 +119,10 @@ void launch_forces(const float* rx, const float* ry, const float* rz,
                    const float V, const float L)
 {
 
-    // Todavía no entiendo que número de bloques y grilla nos conviene usar para el problema
+    dim3 block(CUDA_WARP_SIZE);
 
+    dim3 grid(N);
 
-    // Por ahora tomo N-1 hilos para tener un hilo por cada elemento de N
-    dim3 block(N-1);
-
-    // Por ahora la misma selección de grilla usando los ejemplos de Charly
-    dim3 grid(N-1);
 
     forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho,
                               V, L);

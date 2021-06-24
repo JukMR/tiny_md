@@ -11,9 +11,6 @@
 // #include <cub/cub.cuh>
 
 
-
-//#define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
-
 __device__ void minimum_image(float cordi, const float cell_length, float* result)
 {
     // imagen más cercana
@@ -26,63 +23,6 @@ __device__ void minimum_image(float cordi, const float cell_length, float* resul
     *result = cordi;
 }
 
-// Esta función esta sacada de la wiki de Cuda. capaz sirve.
-
-
-// __device__ double atomicAdd(double* address, double val)
-// {
-//     unsigned long long int* address_as_ull =
-//                              (unsigned long long int*)address;
-//     unsigned long long int old = *address_as_ull, assumed;
-//     do {
-//         assumed = old;
-// old = atomicCAS(address_as_ull, assumed,
-//                         __double_as_longlong(val +
-//                                __longlong_as_double(assumed)));
-//     } while (assumed != old);
-//     return __longlong_as_double(old);
-// }
-
-
-__device__ double atomicAdd2(double* address, double val) {
-unsigned long long int* address_as_ull = (unsigned long long int*)address;
-unsigned long long int old = *address_as_ull, assumed;
-
-            do {
-                  assumed = old;
-                  old = atomicCAS(address_as_ull, assumed, __double_as_longlong(val+__longlong_as_double(assumed)));
-           } while (assumed != old);
-           return __longlong_as_double(old);
-}
-
-// Algo asi capaz si se podria implementar para la reduccion con floats.
-
-
-// __global__ void sum_shared_atomic(const int *in, int n, int *out)
-// {
-//     __shared__ int partial_sum;
-
-//     uint i = blockIdx.x * blockDim.x + threadIdx.x;
-
-//     if (threadIdx.x == 0) {
-//         partial_sum = 0;
-//     }
-
-//     __syncthreads();
-
-//     if (i < n) {
-//         atomicAdd(&partial_sum, in[i]);
-//     }
-
-//     __syncthreads();
-
-//     if (threadIdx.x == 0) {
-//         atomicAdd(out, partial_sum);
-//     }
-// }
-
-
-
 __global__ void forces(const float* rx,
                        const float* ry,
                        const float* rz,
@@ -94,10 +34,9 @@ __global__ void forces(const float* rx,
                        const float* temp,
                        const float rho,
                        const float V,
-                       const float L)
+                       const float L
+                       )
 {
-
-    for (uint row = 0; row < N-1; row++){
 
     float rcut2 = RCUT * RCUT;
     const float RCUT12 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT;
@@ -112,7 +51,10 @@ __global__ void forces(const float* rx,
     float epot_partial = 0.0;
     float pres_vir_partial = 0.0;
 
-	unsigned int j = blockIdx.x*blockDim.x + threadIdx.x;
+
+    unsigned int j =  threadIdx.x;
+    unsigned int row =  blockIdx.x;
+
 
         if (j != row) {
             float xi = rx[row];
@@ -146,9 +88,8 @@ __global__ void forces(const float* rx,
 
                 epot_partial += 4.0 * r6inv * (r6inv - 1.0) - ECUT;
                 pres_vir_partial += fr * rij2;
-            }
         }
-
+    }
 
     atomicAdd(&fx[row], fxi);
     atomicAdd(&fy[row], fyi);
@@ -156,16 +97,9 @@ __global__ void forces(const float* rx,
 
     atomicAdd(epot, epot_partial / 2);
     atomicAdd(pres, pres_vir_partial / 2 / (V * 3.0));
-
-    // fx[row] += fxi;
-    // fy[row] += fyi;
-    // fz[row] += fzi;
-    // *epot += epot_partial / 2;
-    // *pres += pres_vir_partial / 2 / (V * 3.0);
-
-
-    }
 }
+
+
 int div_ceil(int a, int b) {
     return (a + b - 1) / b;
 }
@@ -183,18 +117,12 @@ void launch_forces(const float* rx, const float* ry, const float* rz,
     dim3 block(N-1);
 
     // Por ahora la misma selección de grilla usando los ejemplos de Charly
-    dim3 grid(div_ceil(N-1, block.x));
+    dim3 grid(N-1);
 
-
-    // Este for probablemente no tendria que ir, deberiamos lanzar un kernel que haga esto según el hilo en el que esta parado
-
-
-
-    forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L);
-
+    forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho,
+                              V, L);
 
     checkCudaError(cudaGetLastError());
     checkCudaError(cudaDeviceSynchronize());
-
 }
 

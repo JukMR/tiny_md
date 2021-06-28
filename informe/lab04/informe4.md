@@ -189,7 +189,7 @@ Luego, vimos que los resultados eran mucho mejores para `Jupiterace`, entonces p
 
 * N = [13500, 16384, 19652, 23328, 27436]
 
-en donde 27436 es el N más grande que pudimos probar dentro del limite de tiempo que establece `Slurm`.
+en donde 27436 es el N más grande que pudimos probar dentro del límite de tiempo que establece `Slurm`.
 
 ## Jupiterace
 
@@ -244,10 +244,10 @@ en donde 27436 es el N más grande que pudimos probar dentro del limite de tiemp
 ![Jupiterace vs zx81 GFLOPS](figures/jupiterace_zx81_segundos.png)
 
 
-# Comparación de Tiempos de Labs en Jupiterace
+# Comparación de Tiempos para los distintos Labs en Jupiterace
 
 La siguientes tablas comparan los tiempos que tardaron las diferentes versiones
-del programa en ejecutarse con distintos tamaños de partículas.
+del programa en ejecutarse con distintos números de partículas.
 
 Las celdas que aparecen con `-` no se calcularon por la cantidad de tiempo que
 tomaban en ejecutarse o porque no se calcularon sus valores en los laboratorios
@@ -273,9 +273,9 @@ correspondientes.
 | L4:CUDA            | WARP_SIZE=32 |  0.86 |  3.68  |  8.86  |    13   |
 
 
-## Comparacion de tiempos
+## Comparación de tiempos
 
-La siguiente grafica compara los valores anteriores para contrastar las diferencias de tiempos:
+La siguiente gráfica compara los valores anteriores para contrastar las diferencias de tiempos, está realizada con la tabla normalizada:
 
 ![Comparacion de tiempos entre los 4 labs](figures/tiemposNgpu.png)
 
@@ -379,7 +379,7 @@ N que pudimos medir en cada uno de ellos.
 
 Aquí se encuentran dos mediciones del Lab4 dado que estamos mostrando la del
 mejor **N=10976** que permite compararse con el Lab3 y la mejor que pudimos
-conseguir dentro del limite de tiempo establecido por `Slurm` en Jupiterace con
+conseguir dentro del límite de tiempo establecido por `Slurm` en Jupiterace con
 **N=27436**.
 
 
@@ -389,10 +389,10 @@ conseguir dentro del limite de tiempo establecido por `Slurm` en Jupiterace con
 ![Roofline para N=10976](figures/roofline_done.png)
 
 
-El gráfico del Roofline nos muestra en que punto se encuentra la performance de
-nuestro código. Esté nos muestra dos puntos, el de la izquierda nos muestra la
+El gráfico del Roofline nos muestra en qué punto se encuentra la performance de
+nuestro código. Aparecen dos puntos, el de la izquierda corresponde con la
 intensidad aritmética de las operaciones de punto flotante simple, las cuales
-suponemos que son implementaciones personales del compilador CUDA, y la de la
+suponemos que son implementaciones personales del compilador CUDA, y el de la
 derecha, que es la que nos interesa, es la intensidad aritmética de punto de
 doble precisión.
 
@@ -402,10 +402,10 @@ limitando por falta de poder de cálculo y no de memoria.
 
 Esto tiene mucho sentido dado que el código se esta corriendo sobre una `RTX
 GeForce 2080 Ti` que no posee muchas unidades de cálculo para punto flotante de
-doble precision. En particular, posee solo `1/32` comparado con el total de
+doble precisión. En particular, posee solo `1/32` comparado con el total de
 unidades para cálculo de precisión simple.
 
-Ademas, el valor de performance (FLOP/s) obtenido se encuentra muy cerca del
+Además, el valor de performance (FLOP/s) obtenido se encuentra muy cerca del
 máximo teórico posible sobre cálculos de doble precisión. Esto nos dice que
 estamos aprovechando bien los recursos de cómputo que tenemos disponibles.
 
@@ -441,8 +441,8 @@ que la ejecución normal de la simulación.
 
 ## Extra, comparación float vs double en Jupiterace
 
-Para ver cuanta performance estábamos perdiendo al estar trabajando con doubles
-en vez de floats, modificamos la ultima versión del proyecto para que trabaje
+Para ver cuánta performance estábamos perdiendo al estar trabajando con doubles
+en vez de floats, modificamos la última versión del proyecto para que trabaje
 con floats en lugar de doubles y obtuvimos los siguientes resultados:
 
 ![Double vs Float GFLOPS](figures/double_vs_float_gflops.png)
@@ -455,7 +455,7 @@ Estos resultados son interesantes ya que se observa que la performance esta
 cerca del doble entre utilizar float y doubles. Un resultado lejos del 1/32 que
 pensábamos que podíamos obtener en un principio. Esto refleja que gran parte del
 problema se da por una limitación del ancho de banda de la memoria y no por
-falta de poder de cálculo.
+falta de poder de cálculo, queda para seguir investigando los resultados que daría el roofline en el caso del programa float.
 
 
 

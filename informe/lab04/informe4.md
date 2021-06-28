@@ -423,7 +423,7 @@ que la ejecución normal de la simulación.
 
 * La `RTX 2080 Ti` dio resultados mucho mejores que la `RTX 3070`.
 
-* En el mismo tiempo de simulación, se obtuvo un incremento de **x1.45 GFLOPS** entre el lab3 con **N=10976 **y lab4 con **N=27436**.
+* En el mismo tiempo de simulación, se obtuvo un incremento de **x1.45 GFLOPS** entre el lab3 con **N=10976** y lab4 con **N=27436**.
 
 
 

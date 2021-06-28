@@ -454,8 +454,9 @@ con floats en lugar de doubles y obtuvimos los siguientes resultados:
 Estos resultados son interesantes ya que se observa que la performance esta
 cerca del doble entre utilizar float y doubles. Un resultado lejos del 1/32 que
 pensábamos que podíamos obtener en un principio. Esto refleja que gran parte del
-problema se da por una limitación del ancho de banda de la memoria y no por
-falta de poder de cálculo, queda para seguir investigando los resultados que daría el roofline en el caso del programa float.
+problema se da por una limitación del poder de cómputo y no por el ancho de
+banda de memoria. Queda para seguir investigando los resultados que daría el
+roofline en el caso del programa float.
 
 
 

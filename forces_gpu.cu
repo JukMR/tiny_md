@@ -1,16 +1,9 @@
 // Variables necesarias
 
-// #include <cuda.h> // no se porque esto rompe todo
-
 #include <cuda_runtime.h>
 #include "helper_cuda.h" // checkCudaError
 #include "parameters.h"
 #include <cstdio>
-// #include <cuda.h>
-
-// #include <cub/cub.cuh>
-
-# define CUDA_WARP_SIZE 32
 
 #ifndef BLOCK_SIZE
 # define BLOCK_SIZE 32
@@ -28,27 +21,15 @@ __device__ void minimum_image(double cordi, const double cell_length, double* re
     *result = cordi;
 }
 
-__global__ void forces(const double* rx,
-                       const double* ry,
-                       const double* rz,
-                       double* fx,
-                       double* fy,
-                       double* fz,
-                       double* epot,
-                       double* pres,
-                       const double* temp,
-                       const double rho,
-                       const double V,
-                       const double L
-                       )
-{
 
+__global__ void forces(const double* rx, const double* ry,
+                       const double* rz,    double* fx, double* fy, double* fz, double* epot, double* pres, const double* temp, const double rho, const double V, const double L)
+{
     double rcut2 = RCUT * RCUT;
     const double RCUT12 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT * RCUT;
 
     const double RCUT6 = RCUT * RCUT * RCUT * RCUT * RCUT * RCUT;
     const double ECUT = 4.0 * (1 / (RCUT12)-1 / (RCUT6));
-    // //#define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
 
     double fxi = 0.0;
     double fyi = 0.0;
@@ -56,11 +37,9 @@ __global__ void forces(const double* rx,
     double epot_partial = 0.0;
     double pres_vir_partial = 0.0;
 
-
     unsigned int j =  threadIdx.x;
     unsigned int row =  blockIdx.x;
     for(; j < N ;j+= BLOCK_SIZE){
-
         if (j != row) {
             double xi = rx[row];
             double yi = ry[row];
@@ -90,29 +69,17 @@ __global__ void forces(const double* rx,
                 fyi += fr * ryd;
                 fzi += fr * rzd;
 
-
                 epot_partial += 4.0 * r6inv * (r6inv - 1.0) - ECUT;
                 pres_vir_partial += fr * rij2;
             }
         }
     }
-
-    // fx[row]+=fxi;
-    // fy[row]+=fyi;
-    // fz[row]+=fzi;
     atomicAdd(&fx[row], fxi);
     atomicAdd(&fy[row], fyi);
     atomicAdd(&fz[row], fzi);
 
     atomicAdd(epot, epot_partial / 2);
     atomicAdd(pres, pres_vir_partial / 2 / (V * 3.0));
-
-}
-
-
-int div_ceil(int a, int b)
-{
-    return (a + b - 1) / b;
 }
 
 
@@ -123,9 +90,7 @@ void launch_forces(const double* rx, const double* ry, const double* rz,
 {
 
     dim3 block(BLOCK_SIZE);
-
     dim3 grid(N);
-
 
     forces <<<grid, block>>> (rx, ry, rz, fx, fy, fz, epot, pres, temp, rho,
                               V, L);
